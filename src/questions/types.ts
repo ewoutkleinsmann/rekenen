@@ -17,6 +17,7 @@ export interface Question {
   prompt: string;
   display: QuestionDisplay;
   correctAnswer: number;
+  acceptedAnswers?: string[];
   timeMs: number;
   visualData?: QuestionVisualData;
 }

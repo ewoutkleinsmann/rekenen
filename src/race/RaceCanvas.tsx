@@ -1,13 +1,21 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RaceKeyframe } from "./types";
 import type { TrackSegment } from "../config/schemas";
-import { drawSky } from "./canvas/drawSky";
+import { getPlaybackDurationMs } from "./simulation";
+import { drawBackground } from "./render/drawBackground";
+import { drawTrack, getTrackBounds } from "./render/drawTrack";
+import { drawCar } from "./render/drawCar";
 import {
-  buildTrackLayout,
-  drawTrack,
-  drawFinishGate,
-} from "./canvas/drawTrack";
-import { drawCar } from "./canvas/drawCar";
+  applyCamera,
+  lerp,
+  lerpAngle,
+  resetCamera,
+  updateCamera,
+  type Camera,
+} from "./render/camera";
+import { preloadCarImage } from "./render/preload";
+import { ParticleSystem } from "./render/particles";
+import { TRACK_Y } from "./physics/constants";
 
 interface Props {
   keyframes: RaceKeyframe[];
@@ -16,6 +24,47 @@ interface Props {
   playing: boolean;
   carId?: string;
   onComplete?: () => void;
+}
+
+function interpolateKeyframes(
+  keyframes: RaceKeyframe[],
+  progress: number,
+): RaceKeyframe {
+  if (keyframes.length === 0) {
+    return {
+      tick: 0,
+      x: 0,
+      y: TRACK_Y,
+      angle: 0,
+      velocity: 0,
+      segmentIndex: 0,
+    };
+  }
+  if (keyframes.length === 1 || progress <= 0) return keyframes[0]!;
+
+  const maxTick = keyframes[keyframes.length - 1]!.tick;
+  const targetTick = progress * maxTick;
+
+  let i = 0;
+  while (i < keyframes.length - 2 && keyframes[i + 1]!.tick < targetTick) {
+    i++;
+  }
+
+  const a = keyframes[i]!;
+  const b = keyframes[i + 1]!;
+  const span = b.tick - a.tick;
+  const t = span > 0 ? (targetTick - a.tick) / span : 0;
+
+  return {
+    tick: lerp(a.tick, b.tick, t),
+    x: lerp(a.x, b.x, t),
+    y: lerp(a.y, b.y, t),
+    angle: lerpAngle(a.angle, b.angle, t),
+    velocity: lerp(a.velocity, b.velocity, t),
+    segmentIndex: t < 0.5 ? a.segmentIndex : b.segmentIndex,
+    boosting: a.boosting || b.boosting,
+    airborne: a.airborne || b.airborne,
+  };
 }
 
 export function RaceCanvas({
@@ -27,55 +76,88 @@ export function RaceCanvas({
   onComplete,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const frameRef = useRef(0);
-  const layoutRef = useRef<ReturnType<typeof buildTrackLayout> | null>(null);
+  const cameraRef = useRef<Camera>({ x: 0, y: 0, zoom: 1 });
+  const particlesRef = useRef(new ParticleSystem());
+  const completedRef = useRef(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!playing || keyframes.length === 0) return;
+    preloadCarImage(carId).then(() => setReady(true));
+  }, [carId]);
+
+  useEffect(() => {
+    if (!playing || keyframes.length === 0 || !ready) return;
+
+    completedRef.current = false;
+    particlesRef.current = new ParticleSystem();
 
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    frameRef.current = 0;
     const dpr = window.devicePixelRatio || 1;
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    ctx.scale(dpr, dpr);
+    const viewW = canvas.clientWidth;
+    const viewH = canvas.clientHeight;
+    canvas.width = viewW * dpr;
+    canvas.height = viewH * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const maxX = Math.max(...keyframes.map((k) => k.x), 200);
-    const layout = buildTrackLayout(segments, w, h);
-    layoutRef.current = layout;
+    const bounds = getTrackBounds(segments);
+    const durationMs = getPlaybackDurationMs(
+      keyframes[keyframes.length - 1]?.tick ?? 0,
+    );
+    const startTime = performance.now();
+    let lastBoost = false;
 
-    const render = () => {
-      drawSky(ctx, w, h);
-      drawTrack(ctx, segments, layout);
-      drawFinishGate(ctx, w, h, success);
+    const render = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / durationMs);
+      const kf = interpolateKeyframes(keyframes, progress);
 
-      const idx = Math.min(frameRef.current, keyframes.length - 1);
-      const kf = keyframes[idx]!;
-      const px = 20 + (kf.x / maxX) * (w - 60);
-      const py = h * 0.72 + kf.y;
+      cameraRef.current = updateCamera(
+        cameraRef.current,
+        kf.x,
+        kf.y,
+        viewW,
+        viewH,
+      );
 
-      drawCar(ctx, px, py - 8, kf.velocity, carId);
-    };
+      ctx.clearRect(0, 0, viewW, viewH);
 
-    render();
+      applyCamera(ctx, cameraRef.current);
+      drawBackground(ctx, cameraRef.current.x, viewW, viewH, bounds.minY);
+      drawTrack(ctx, segments, now);
 
-    const interval = setInterval(() => {
-      render();
-      frameRef.current++;
-      if (frameRef.current >= keyframes.length) {
-        clearInterval(interval);
+      if (kf.boosting && !lastBoost) {
+        particlesRef.current.emitBoost(kf.x - 30, kf.y);
+      }
+      if (kf.velocity > 25 && !kf.airborne) {
+        particlesRef.current.emitDust(kf.x - 20, kf.y + 8, 1);
+      }
+      if (progress >= 0.98 && success) {
+        particlesRef.current.emitConfetti(kf.x, kf.y - 20);
+      }
+      lastBoost = !!kf.boosting;
+
+      particlesRef.current.update();
+      particlesRef.current.draw(ctx);
+
+      drawCar(ctx, kf.x, kf.y, kf.angle, kf.velocity, carId, !!kf.boosting);
+
+      resetCamera(ctx);
+
+      if (progress < 1) {
+        requestAnimationFrame(render);
+      } else if (!completedRef.current) {
+        completedRef.current = true;
         onComplete?.();
       }
-    }, 33);
+    };
 
-    return () => clearInterval(interval);
-  }, [keyframes, segments, success, playing, carId, onComplete]);
+    const frame = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(frame);
+  }, [keyframes, segments, success, playing, carId, onComplete, ready]);
 
   return (
     <div className="race-canvas-wrap">

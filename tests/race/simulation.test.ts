@@ -68,4 +68,15 @@ describe("race simulation", () => {
     expect(result.success).toBe(false);
     expect(result.failureReason).toContain("Baan Blaster");
   });
+
+  it("keyframes move from start to finish with sensible angles", () => {
+    const stats = computeEffectiveStats(boosterBlaze);
+    const result = simulateRace(stats, getTrack("track-01").segments);
+    expect(result.success).toBe(true);
+    const first = result.keyframes[0]!;
+    const last = result.keyframes[result.keyframes.length - 1]!;
+    expect(first.x).toBeLessThan(last.x);
+    expect(Math.abs(first.angle)).toBeLessThan(Math.PI / 2);
+    expect(last.x).toBeGreaterThan(first.x + 500);
+  });
 });

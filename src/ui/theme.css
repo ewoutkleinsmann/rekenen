@@ -24,7 +24,7 @@
   --hw-question-text: #1a1a2e;
   --radius: 12px;
   --radius-sm: 8px;
-  --touch-min: 48px;
+  --btn-min: 40px;
   --shadow-panel: 0 4px 20px rgba(0, 0, 0, 0.4);
   --shadow-glow: 0 0 20px rgba(255, 107, 0, 0.4);
   font-family: "Fredoka", "Segoe UI", system-ui, sans-serif;
@@ -44,12 +44,13 @@ body {
   );
   color: var(--hw-text);
   min-height: 100vh;
+  min-width: 1024px;
 }
 
 .app {
-  max-width: 720px;
+  max-width: 880px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 2rem 2.5rem;
   min-height: 100vh;
   position: relative;
 }
@@ -65,7 +66,7 @@ body {
 
 .hw-title {
   font-family: "Rajdhani", sans-serif;
-  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-size: 2.4rem;
   font-weight: 700;
   font-style: italic;
   color: var(--hw-orange);
@@ -151,8 +152,8 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  min-height: var(--touch-min);
-  min-width: var(--touch-min);
+  min-height: var(--btn-min);
+  min-width: var(--btn-min);
   padding: 0.6rem 1.2rem;
   border: none;
   border-radius: var(--radius);
@@ -337,56 +338,48 @@ body {
   background: var(--hw-yellow);
 }
 
-/* Keypad */
-.hw-keypad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 1rem;
+/* Answer input */
+.hw-answer-row {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+  max-width: 520px;
+  margin: 2rem auto 0;
 }
 
-.hw-keypad button {
-  min-height: var(--touch-min);
-  font-family: "Rajdhani", sans-serif;
-  font-size: 1.4rem;
-  font-weight: 700;
-  border: 2px solid var(--hw-orange);
-  border-radius: var(--radius-sm);
-  background: var(--hw-blue);
-  color: white;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    transform 0.1s;
-}
-
-.hw-keypad button:hover {
-  background: var(--hw-light-blue);
-}
-
-.hw-keypad button:active {
-  transform: scale(0.95);
-}
-
-.hw-keypad button.hw-key-wide {
-  grid-column: span 2;
-  background: linear-gradient(180deg, var(--hw-success), #16a34a);
-  border-color: #16a34a;
-}
-
-/* Input */
 .hw-answer-input {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   font-family: "Rajdhani", sans-serif;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  padding: 0.75rem;
+  padding: 0.85rem 1rem;
   border: 3px solid var(--hw-orange);
   border-radius: var(--radius);
   text-align: center;
   background: rgba(0, 0, 0, 0.4);
   color: white;
   font-variant-numeric: tabular-nums;
+}
+
+.hw-answer-input::placeholder {
+  color: var(--hw-muted);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.hw-answer-submit {
+  flex-shrink: 0;
+  padding-inline: 1.5rem;
+  white-space: nowrap;
+}
+
+.hw-answer-hint {
+  text-align: center;
+  margin: 0.75rem 0 0;
+  color: var(--hw-muted);
+  font-size: 0.85rem;
+  font-family: "Rajdhani", sans-serif;
 }
 
 .hw-select {
@@ -634,7 +627,7 @@ body {
 .race-canvas-wrap canvas {
   display: block;
   width: 100%;
-  height: 200px;
+  height: 320px;
 }
 
 /* Screen layouts */
@@ -672,7 +665,11 @@ body {
 }
 
 .quiz-round .question-area {
-  margin: 1rem 0;
+  margin: 1.5rem 0 2rem;
+}
+
+.quiz-round .hw-feedback {
+  margin: 1rem 0 0;
 }
 
 .shop-screen .shop-earned-line {
@@ -891,6 +888,43 @@ body {
 
 @media (min-width: 600px) {
   .race-canvas-wrap canvas {
-    height: 280px;
+    height: 360px;
   }
+}
+
+.race-dev-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.race-dev-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 600;
+}
+
+.race-dev-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "Rajdhani", sans-serif;
+}
+
+.race-dev-debug {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-sm);
+  font-family: "Rajdhani", sans-serif;
+}
+
+.race-dev-meta {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  font-family: ui-monospace, monospace;
+  color: var(--hw-muted);
 }

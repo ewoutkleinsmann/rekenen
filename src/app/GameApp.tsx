@@ -5,15 +5,27 @@ import { QuizRound } from "./QuizRound";
 import { ShopScreen } from "./ShopScreen";
 import { CarSelectScreen } from "./CarSelectScreen";
 import { RaceScreen } from "./RaceScreen";
+import { RaceDevScreen } from "./RaceDevScreen";
 import { ResultScreen } from "./ResultScreen";
+
+function isRaceDevMode(): boolean {
+  return (
+    import.meta.env.DEV &&
+    new URLSearchParams(window.location.search).has("devRace")
+  );
+}
 
 export function GameApp() {
   const phase = useGameStore((s) => s.phase);
   const init = useGameStore((s) => s.init);
 
   useEffect(() => {
-    init();
+    if (!isRaceDevMode()) init();
   }, [init]);
+
+  if (isRaceDevMode()) {
+    return <RaceDevScreen />;
+  }
 
   switch (phase) {
     case "title":

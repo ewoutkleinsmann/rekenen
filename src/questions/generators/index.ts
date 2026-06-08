@@ -2,6 +2,7 @@ import type { QuestionGenerator } from "../types";
 import { createPrng, randomInt, pickOne, pickScenario } from "../prng";
 import { getQuestionTimeMs } from "../../quiz/time";
 import { getQuestionType } from "../../config/loadConfig";
+import { getAcceptedClockAnswers } from "../clockAnswer";
 
 function makeId(ctx: { seed: number; index: number }, type: string): string {
   return `${type}-${ctx.seed}-${ctx.index}`;
@@ -351,15 +352,25 @@ function makeClockVisual(
     const hour = randomInt(rng, 1, 12);
     const minute = pickOne(rng, allowedMinutes);
     const prompt = pickOne(rng, [
-      "Hoe laat is het op de klok? (HHMM)",
-      "Kijk naar de klok. Hoe laat is het? (HHMM)",
-      "Wat is de tijd op de klok? (HHMM)",
+      "Hoe laat is het op de klok?",
+      "Kijk naar de klok. Hoe laat is het?",
+      "Wat is de tijd op de klok?",
     ]);
-    return baseQuestion(ctx, typeId, prompt, hour * 100 + minute, "clock", {
-      clockHour: hour,
-      clockMinute: minute,
-      clockStyle: pickOne(rng, ["analog", "digital"]),
-    });
+    const typeConfig = getQuestionType(typeId);
+    return {
+      id: makeId(ctx, typeId),
+      type: typeId,
+      prompt,
+      display: typeConfig.display ?? "clock",
+      correctAnswer: hour * 100 + minute,
+      acceptedAnswers: getAcceptedClockAnswers(hour, minute),
+      timeMs: getQuestionTimeMs(ctx.baseTimeMs, typeId),
+      visualData: {
+        clockHour: hour,
+        clockMinute: minute,
+        clockStyle: pickOne(rng, ["analog", "digital"]),
+      },
+    };
   };
 }
 

@@ -5,8 +5,11 @@ export interface RaceKeyframe {
   tick: number;
   x: number;
   y: number;
+  angle: number;
   velocity: number;
   segmentIndex: number;
+  boosting?: boolean;
+  airborne?: boolean;
 }
 
 export interface SimulationResult {
@@ -20,4 +23,10 @@ export interface SimulationResult {
 export interface SimulationInput {
   stats: EffectiveStats;
   segments: TrackSegment[];
+}
+
+export interface TrackLayoutData {
+  pathPoints: { x: number; y: number; angle: number; segmentIndex: number }[];
+  finishX: number;
+  bounds: { minX: number; maxX: number; minY: number; maxY: number };
 }

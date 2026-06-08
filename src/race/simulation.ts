@@ -1,9 +1,30 @@
 import type { TrackSegment } from "../config/schemas";
 import type { EffectiveStats } from "../garage/stats";
 import type { RaceKeyframe, SimulationResult } from "./types";
+import { createCarBody } from "./physics/carFactory";
+import { createRaceEngine } from "./physics/engine";
+import {
+  KEYFRAME_INTERVAL,
+  MAX_TICKS,
+  MIN_RACE_MS,
+  SIM_DT,
+  TRACK_Y,
+} from "./physics/constants";
+import { checkCurveOngoing, checkSegmentEntry } from "./physics/segmentRules";
+import {
+  buildTrack,
+  getSegmentAtDist,
+  pointAtDist,
+} from "./physics/trackBuilder";
+import Matter from "matter-js";
 
-const DT = 1 / 60;
-const MAX_TICKS = 6000;
+/** Converts game velocity stat to pixels advanced per simulation tick. */
+const PX_PER_TICK_SCALE = 2.5;
+
+export function getPlaybackDurationMs(totalTicks: number): number {
+  const simMs = totalTicks * SIM_DT * 1000;
+  return Math.max(MIN_RACE_MS, simMs);
+}
 
 function maxCurveSpeed(stats: EffectiveStats, radius: number): number {
   return ((stats.handling + stats.grip) / 2) * (radius / 30);
@@ -26,148 +47,212 @@ function boostVelocity(
   return Math.max(velocity, 20) * boostFactor;
 }
 
-export function simulate(
-  stats: EffectiveStats,
-  segments: TrackSegment[],
+function recordKeyframe(
+  keyframes: RaceKeyframe[],
+  tick: number,
+  pt: { x: number; y: number; angle: number },
+  velocity: number,
+  segmentIndex: number,
+  boosting: boolean,
+  airborne: boolean,
+) {
+  keyframes.push({
+    tick,
+    x: pt.x,
+    y: pt.y,
+    angle: pt.angle,
+    velocity,
+    segmentIndex,
+    boosting,
+    airborne,
+  });
+}
+
+function fail(
+  reason: string,
+  segmentIndex: number,
+  keyframes: RaceKeyframe[],
+  tick: number,
 ): SimulationResult {
-  let velocity = 0;
-  let segmentProgress = 0;
-  let segmentIndex = 0;
-  let x = 0;
-  let y = 0;
-  const keyframes: RaceKeyframe[] = [];
-  let tick = 0;
-
-  const record = () => {
-    if (tick % 3 === 0) {
-      keyframes.push({ tick, x, y, velocity, segmentIndex });
-    }
-  };
-
-  const fail = (reason: string): SimulationResult => ({
+  return {
     success: false,
     failureReason: reason,
     failureSegmentIndex: segmentIndex,
     keyframes,
     totalTicks: tick,
-  });
+  };
+}
 
-  while (segmentIndex < segments.length && tick < MAX_TICKS) {
-    const segment = segments[segmentIndex]!;
-    record();
+interface CrossFail {
+  segIdx: number;
+  reason: string;
+}
 
-    switch (segment.type) {
-      case "straight": {
-        velocity = Math.min(maxSpeed(stats), velocity + accelRate(stats) * DT);
-        const step = velocity * DT;
-        segmentProgress += step;
-        x += step;
-        if (segmentProgress >= segment.length) {
-          segmentProgress = 0;
-          segmentIndex++;
-        }
-        break;
+function checkCrossedSegments(
+  track: ReturnType<typeof buildTrack>,
+  stats: EffectiveStats,
+  velocity: number,
+  from: number,
+  to: number,
+  entered: Set<number>,
+): CrossFail | null {
+  for (const meta of track.segments) {
+    const boundary = meta.startDist;
+    if (from < boundary && to >= boundary && !entered.has(meta.index)) {
+      entered.add(meta.index);
+      const check = checkSegmentEntry(meta.segment, stats, velocity);
+      if (!check.ok) return { segIdx: meta.index, reason: check.reason! };
+    }
+  }
+  return null;
+}
+
+export function simulate(
+  stats: EffectiveStats,
+  segments: TrackSegment[],
+): SimulationResult {
+  const track = buildTrack(segments);
+  const engine = createRaceEngine();
+  Matter.World.add(engine.world, [...track.bodies, ...track.sensors]);
+
+  const startPt = track.pathPoints[0]!;
+  const car = createCarBody(stats, startPt.x, TRACK_Y);
+  Matter.World.add(engine.world, car.body);
+
+  const keyframes: RaceKeyframe[] = [];
+  let tick = 0;
+  let velocity = 0;
+  let pathDist = 0;
+  const enteredSegments = new Set<number>([0]);
+  let boosting = false;
+
+  recordKeyframe(keyframes, 0, startPt, 0, 0, false, false);
+
+  const failAt = (reason: string, segIdx: number): SimulationResult =>
+    fail(reason, segIdx, keyframes, tick);
+
+  while (tick < MAX_TICKS) {
+    const segMeta = getSegmentAtDist(track.segments, pathDist);
+    const currentSegment = segMeta.index;
+    const seg = segMeta.segment;
+
+    if (seg.type === "curve") {
+      const ongoing = checkCurveOngoing(seg, stats, velocity);
+      if (!ongoing.ok) {
+        const pt = pointAtDist(track.pathPoints, pathDist);
+        recordKeyframe(
+          keyframes,
+          tick,
+          pt,
+          velocity,
+          currentSegment,
+          boosting,
+          false,
+        );
+        return failAt(ongoing.reason!, currentSegment);
       }
+    }
+
+    boosting = false;
+    const airborne = seg.type === "jump" && pathDist > segMeta.startDist + 20;
+
+    switch (seg.type) {
+      case "straight":
+        velocity = Math.min(
+          maxSpeed(stats),
+          velocity + accelRate(stats) * SIM_DT,
+        );
+        break;
       case "curve": {
-        const maxV = maxCurveSpeed(stats, segment.radius);
-        if (stats.grip < segment.minGrip) {
-          return fail("Niet genoeg grip voor deze bocht!");
-        }
+        const maxV = maxCurveSpeed(stats, seg.radius);
         if (velocity > maxV) {
-          const brake = stats.handling * 4 * DT;
-          velocity -= brake;
-          if (velocity > maxV * 1.1 && stats.handling < segment.minGrip) {
-            return fail("Te hard de bocht in! Meer grip of handling nodig.");
-          }
+          velocity -= stats.handling * 4 * SIM_DT;
         }
         velocity = Math.min(
           maxV,
-          Math.max(velocity, 0) + accelRate(stats) * DT * 0.3,
+          Math.max(velocity, 0) + accelRate(stats) * SIM_DT * 0.3,
         );
-        const arcLength = (segment.angle / 360) * 2 * Math.PI * segment.radius;
-        const step = velocity * DT;
-        segmentProgress += step;
-        x += step * 0.8;
-        y += Math.sin(segmentProgress / Math.max(segment.radius, 1)) * 1.5;
-        if (segmentProgress >= arcLength) {
-          segmentProgress = 0;
-          segmentIndex++;
-          y = 0;
-        }
         break;
       }
-      case "booster": {
-        velocity = boostVelocity(velocity, stats, segment.boostMultiplier);
-        x += velocity * DT * 2;
-        segmentIndex++;
+      case "booster":
+        velocity = boostVelocity(velocity, stats, seg.boostMultiplier);
+        boosting = true;
         break;
-      }
-      case "loop": {
-        const effectiveEntry = velocity + stats.speed * 0.15;
-        if (effectiveEntry < segment.minEntrySpeed) {
-          return fail("Niet genoeg snelheid voor de loop!");
-        }
-        if (stats.grip < segment.minGrip) {
-          return fail("Niet genoeg grip voor de loop!");
-        }
-        const loopLength = 2 * Math.PI * segment.radius;
-        const step = velocity * DT;
-        segmentProgress += step;
-        y -= 2;
-        x += step * 0.6;
-        if (segmentProgress >= loopLength) {
-          segmentProgress = 0;
-          segmentIndex++;
-          y = 0;
-        }
+      case "rocket":
+        velocity = boostVelocity(velocity, stats, seg.boostMultiplier);
+        boosting = true;
         break;
-      }
-      case "jump": {
-        velocity = Math.min(maxSpeed(stats), velocity + accelRate(stats) * DT);
-        if (velocity < segment.minSpeed) {
-          return fail("Te weinig snelheid voor de sprong!");
-        }
-        if (stats.weight > segment.maxWeight) {
-          return fail("Auto te zwaar voor een veilige landing!");
-        }
-        const step = velocity * DT;
-        segmentProgress += step;
-        y -= 5;
-        x += step;
-        if (segmentProgress >= segment.length) {
-          segmentProgress = 0;
-          segmentIndex++;
-          y = 0;
-        }
+      case "loop":
+        velocity = Math.max(velocity, maxSpeed(stats) * 0.6);
         break;
-      }
-      case "rocket": {
-        if (!stats.unlocks.includes("rocket-segment")) {
-          return fail("Je hebt Baan Blaster Rockets nodig voor dit stuk!");
-        }
-        velocity = boostVelocity(velocity, stats, segment.boostMultiplier);
-        x += velocity * DT * 2;
-        segmentIndex++;
+      case "jump":
+        velocity = Math.min(
+          maxSpeed(stats),
+          velocity + accelRate(stats) * SIM_DT,
+        );
         break;
-      }
-      default:
-        segmentIndex++;
+    }
+
+    const prevDist = pathDist;
+    pathDist += velocity * SIM_DT * PX_PER_TICK_SCALE;
+
+    const crossed = checkCrossedSegments(
+      track,
+      stats,
+      velocity,
+      prevDist,
+      pathDist,
+      enteredSegments,
+    );
+    if (crossed) {
+      const pt = pointAtDist(track.pathPoints, pathDist);
+      recordKeyframe(
+        keyframes,
+        tick,
+        pt,
+        velocity,
+        crossed.segIdx,
+        boosting,
+        false,
+      );
+      return failAt(crossed.reason, crossed.segIdx);
+    }
+
+    const targetPt = pointAtDist(track.pathPoints, pathDist);
+
+    if (tick % KEYFRAME_INTERVAL === 0) {
+      recordKeyframe(
+        keyframes,
+        tick,
+        targetPt,
+        velocity,
+        currentSegment,
+        boosting,
+        airborne,
+      );
+    }
+
+    if (pathDist >= track.totalLength * 0.98) {
+      const finishPt = pointAtDist(track.pathPoints, track.totalLength);
+      recordKeyframe(
+        keyframes,
+        tick,
+        finishPt,
+        velocity,
+        segments.length - 1,
+        false,
+        false,
+      );
+      return { success: true, keyframes, totalTicks: tick };
     }
 
     tick++;
   }
 
-  record();
-
-  if (segmentIndex < segments.length) {
-    return fail("Race duurde te lang — meer snelheid nodig!");
-  }
-
-  return {
-    success: true,
-    keyframes,
-    totalTicks: tick,
-  };
+  return failAt(
+    "Race duurde te lang — meer snelheid nodig!",
+    segments.length - 1,
+  );
 }
 
 export function simulateRace(

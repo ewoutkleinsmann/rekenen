@@ -3,6 +3,7 @@ import { getScoringConfig } from "../config/loadConfig";
 import { createPrng, pickOne } from "./prng";
 import { generators } from "./generators";
 import type { Question } from "./types";
+import { validateClockAnswer } from "./clockAnswer";
 
 export function generateQuestion(
   levelId: number,
@@ -33,6 +34,12 @@ export function generateRoundQuestions(
 }
 
 export function validateAnswer(question: Question, input: string): boolean {
+  if (question.display === "clock" && question.visualData) {
+    const { clockHour, clockMinute } = question.visualData;
+    if (clockHour == null || clockMinute == null) return false;
+    return validateClockAnswer(clockHour, clockMinute, input);
+  }
+
   const normalized = input.trim().replace(/\s/g, "");
   if (normalized === "") return false;
   const num = parseInt(normalized, 10);

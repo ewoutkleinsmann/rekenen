@@ -64,6 +64,15 @@ export function TitleScreen() {
         >
           {hasSave ? "Nieuw spel" : "Start Engine!"}
         </button>
+        {import.meta.env.DEV && (
+          <a
+            href="?devRace=1"
+            className="hw-btn hw-btn-secondary"
+            style={{ textAlign: "center", textDecoration: "none" }}
+          >
+            Race dev
+          </a>
+        )}
       </div>
       <div className="hw-footer">
         <img src="/assets/brand/mattel-logo.svg" alt="Mattel" />

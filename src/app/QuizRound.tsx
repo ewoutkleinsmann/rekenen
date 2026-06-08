@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGameStore } from "../game/store";
 import { getLevel } from "../config/loadConfig";
+import { validateAnswer } from "../questions/registry";
 import { QuestionDisplay } from "../ui/QuestionDisplay";
 import { ScreenShell } from "../ui/ScreenShell";
 import { CheckeredFlagIcon } from "../ui/icons";
@@ -49,19 +50,16 @@ export function QuizRound() {
 
   if (!question || !roundState) return null;
 
+  const isClockQuestion = question.display === "clock";
   const pct = (timeRemaining / question.timeMs) * 100;
 
   const handleSubmit = () => {
     if (feedback) return;
     const remaining = Math.max(0, timeRemaining);
-    const num = parseInt(input.trim(), 10);
-    const ok = !Number.isNaN(num) && num === question.correctAnswer;
+    const ok = validateAnswer(question, input);
     setFeedback(ok ? "ok" : "bad");
     setTimeout(() => goNext(remaining), 600);
   };
-
-  const appendDigit = (d: string) => setInput((v) => v + d);
-  const backspace = () => setInput((v) => v.slice(0, -1));
 
   return (
     <ScreenShell
@@ -115,33 +113,34 @@ export function QuizRound() {
           )}
         </p>
       )}
-      <input
-        className="hw-answer-input"
-        value={input}
-        onChange={(e) => setInput(e.target.value.replace(/\D/g, ""))}
-        onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-        inputMode="numeric"
-        aria-label="Antwoord"
-        autoFocus
-      />
-      <div className="hw-keypad">
-        {["1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0", "✓"].map(
-          (key) => (
-            <button
-              key={key}
-              type="button"
-              className={key === "✓" ? "hw-key-wide" : ""}
-              onClick={() => {
-                if (key === "⌫") backspace();
-                else if (key === "✓") handleSubmit();
-                else appendDigit(key);
-              }}
-            >
-              {key}
-            </button>
-          ),
-        )}
+      <div className="hw-answer-row">
+        <input
+          className="hw-answer-input"
+          value={input}
+          onChange={(e) =>
+            setInput(
+              isClockQuestion
+                ? e.target.value
+                : e.target.value.replace(/\D/g, ""),
+            )
+          }
+          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+          inputMode={isClockQuestion ? "text" : "numeric"}
+          aria-label="Antwoord"
+          placeholder={
+            isClockQuestion ? "bijv. drie uur, half vijf" : "Typ je antwoord"
+          }
+          autoFocus
+        />
+        <button
+          type="button"
+          className="hw-btn hw-btn-primary hw-answer-submit"
+          onClick={handleSubmit}
+        >
+          Antwoord
+        </button>
       </div>
+      <p className="hw-answer-hint">Druk op Enter om te bevestigen</p>
     </ScreenShell>
   );
 }

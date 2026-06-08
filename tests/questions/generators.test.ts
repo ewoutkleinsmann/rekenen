@@ -65,7 +65,8 @@ describe("question generators", () => {
     const quarter = generateQuestion(2, 5, 0, "clock_quarter");
     expect(half.display).toBe("clock");
     expect(quarter.display).toBe("clock");
-    expect(half.prompt).not.toContain("De klok wijst");
+    expect(half.prompt).not.toContain("HHMM");
+    expect(half.acceptedAnswers?.length).toBeGreaterThan(0);
     expect([0, 30]).toContain(half.visualData?.clockMinute);
     expect([0, 15, 30, 45]).toContain(quarter.visualData?.clockMinute);
   });
