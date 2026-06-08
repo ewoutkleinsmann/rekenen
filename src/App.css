@@ -1,0 +1,15 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.tagline {
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--text-muted);
+}
