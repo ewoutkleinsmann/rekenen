@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 48" role="img" aria-label="Booster Blaze">
+  <defs><linearGradient id="bb-body" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF2D00"/><stop offset="100%" stop-color="#DA291C"/></linearGradient></defs>
+  <!-- Twin Mill style dual engine -->
+  <ellipse cx="18" cy="38" rx="10" ry="10" fill="#1A1A2E" stroke="#888" stroke-width="1.5"/>
+  <ellipse cx="18" cy="38" rx="4" ry="4" fill="#555"/>
+  <ellipse cx="95" cy="38" rx="10" ry="10" fill="#1A1A2E" stroke="#888" stroke-width="1.5"/>
+  <ellipse cx="95" cy="38" rx="4" ry="4" fill="#555"/>
+  <path d="M10 30 L25 22 L35 18 L70 16 L100 18 L110 22 L115 28 L110 32 L100 30 L70 28 L35 30 L25 32 L10 34 Z" fill="url(#bb-body)" stroke="#FFE600" stroke-width="1"/>
+  <rect x="30" y="20" width="12" height="8" rx="2" fill="#FF6B00" stroke="#FFE600" stroke-width="0.5"/>
+  <rect x="70" y="20" width="12" height="8" rx="2" fill="#FF6B00" stroke="#FFE600" stroke-width="0.5"/>
+  <path d="M105 22 L115 20 L115 26 L105 26 Z" fill="#87CEEB" opacity="0.7"/>
+  <rect x="40" y="24" width="30" height="3" fill="#FFE600" opacity="0.8"/>
+  <text x="55" y="27" text-anchor="middle" font-size="3" fill="#DA291C" font-weight="bold">BB</text>
+</svg>

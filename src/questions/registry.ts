@@ -11,7 +11,7 @@ export function generateQuestion(
   categoryOverride?: string,
 ): Question {
   const level = getLevel(levelId);
-  const rng = createPrng(seed + index);
+  const rng = createPrng(seed + index * 117);
   const category = categoryOverride ?? pickOne(rng, level.questionCategories);
   const generator = generators[category];
   if (!generator) {
@@ -25,8 +25,10 @@ export function generateRoundQuestions(
   seed: number,
 ): Question[] {
   const { questionsPerRound } = getScoringConfig();
+  const level = getLevel(levelId);
+  const rng = createPrng(seed);
   return Array.from({ length: questionsPerRound }, (_, i) =>
-    generateQuestion(levelId, seed, i),
+    generateQuestion(levelId, seed, i, pickOne(rng, level.questionCategories)),
   );
 }
 

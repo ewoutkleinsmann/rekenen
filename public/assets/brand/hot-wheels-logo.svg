@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" role="img" aria-label="Hot Wheels">
+  <defs>
+    <linearGradient id="flameGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE600"/>
+      <stop offset="40%" stop-color="#FF6B00"/>
+      <stop offset="100%" stop-color="#DA291C"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#FFE600"/>
+      <stop offset="100%" stop-color="#FF8C00"/>
+    </linearGradient>
+  </defs>
+  <!-- Flame swoosh background -->
+  <path fill="url(#flameGrad)" d="M20 95 C5 70 0 45 15 25 C25 10 45 5 70 8 C55 20 50 40 60 55 C70 70 90 75 110 70 C85 80 55 95 20 95Z"/>
+  <path fill="#DA291C" d="M110 70 C130 60 160 55 200 58 C240 61 280 70 310 85 C280 75 240 68 200 65 C160 62 130 65 110 70Z"/>
+  <path fill="#FF2D00" opacity="0.6" d="M60 55 C75 48 95 45 115 48 C100 52 85 58 70 65 C65 62 62 58 60 55Z"/>
+  <!-- Hot Wheels text -->
+  <text x="115" y="72" font-family="Arial Black, Impact, sans-serif" font-size="42" font-weight="900" font-style="italic" fill="url(#textGrad)" stroke="#DA291C" stroke-width="2" letter-spacing="-1">Hot</text>
+  <text x="115" y="108" font-family="Arial Black, Impact, sans-serif" font-size="42" font-weight="900" font-style="italic" fill="url(#textGrad)" stroke="#DA291C" stroke-width="2" letter-spacing="-1">Wheels</text>
+  <!-- Wheel element -->
+  <circle cx="55" cy="82" r="18" fill="#1A1A2E" stroke="#FFE600" stroke-width="3"/>
+  <circle cx="55" cy="82" r="6" fill="#FFE600"/>
+  <line x1="55" y1="64" x2="55" y2="100" stroke="#FFE600" stroke-width="2.5"/>
+  <line x1="37" y1="82" x2="73" y2="82" stroke="#FFE600" stroke-width="2.5"/>
+  <line x1="42" y1="69" x2="68" y2="95" stroke="#FFE600" stroke-width="2"/>
+  <line x1="68" y1="69" x2="42" y2="95" stroke="#FFE600" stroke-width="2"/>
+</svg>

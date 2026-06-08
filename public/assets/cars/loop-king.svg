@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 48" role="img" aria-label="Loop King">
+  <defs><linearGradient id="lk-body" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9B59B6"/><stop offset="100%" stop-color="#6C3483"/></linearGradient></defs>
+  <ellipse cx="24" cy="38" rx="12" ry="12" fill="#1A1A2E" stroke="#888" stroke-width="1.5"/>
+  <ellipse cx="24" cy="38" rx="5" ry="5" fill="#555"/>
+  <ellipse cx="88" cy="38" rx="12" ry="12" fill="#1A1A2E" stroke="#888" stroke-width="1.5"/>
+  <ellipse cx="88" cy="38" rx="5" ry="5" fill="#555"/>
+  <path d="M14 32 L30 26 L50 22 L78 22 L100 26 L108 30 L104 34 L88 32 L50 32 L30 34 L14 36 Z" fill="url(#lk-body)" stroke="#FFE600" stroke-width="1"/>
+  <circle cx="56" cy="26" r="6" fill="none" stroke="#FFE600" stroke-width="1.5"/>
+  <path d="M98 26 L108 24 L108 30 L98 30 Z" fill="#87CEEB" opacity="0.6"/>
+  <rect x="40" y="28" width="35" height="2" fill="#FFE600"/>
+</svg>

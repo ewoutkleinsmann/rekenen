@@ -3,6 +3,8 @@ import { useGameStore } from "../game/store";
 import { getPurchasableCars, getAvailableUpgrades } from "../garage/shop";
 import { getUpgradePrice, getUpgradeLevel } from "../garage/stats";
 import { getCar } from "../config/loadConfig";
+import { ScreenShell } from "../ui/ScreenShell";
+import { WheelCreditIcon, CarSvg } from "../ui/icons";
 
 export function ShopScreen() {
   const credits = useGameStore((s) => s.credits);
@@ -22,12 +24,18 @@ export function ShopScreen() {
   const carInstance = ownedCars.find((c) => c.instanceId === selectedCar);
 
   return (
-    <div className="shop-screen">
-      <h2 className="hw-title" style={{ fontSize: "1.5rem" }}>
+    <ScreenShell variant="shop" className="shop-screen" credits={credits}>
+      <h2
+        className="hw-title"
+        style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}
+      >
         Booster Shop
       </h2>
-      <p className="hw-credits" style={{ textAlign: "center" }}>
-        +{earned} verdiend! Totaal: 🛞 {credits} Wheel Credits
+      <p className="shop-earned-line">
+        <span className="shop-earned">+{earned} verdiend!</span>
+        <span className="shop-total">
+          Totaal: <WheelCreditIcon size={20} /> {credits} Wheel Credits
+        </span>
       </p>
       <div className="hw-tabs">
         <button
@@ -45,76 +53,108 @@ export function ShopScreen() {
           Upgrades
         </button>
       </div>
-      {tab === "cars" && (
-        <div>
-          {purchasableCars.length === 0 && <p>Je hebt alle auto&apos;s!</p>}
-          {purchasableCars.map((car) => (
-            <div key={car.id} className="hw-car-card">
-              <strong>{car.name}</strong>
-              <p>{car.description}</p>
-              <p className="hw-credits">🛞 {car.price}</p>
-              <button
-                type="button"
-                className="hw-btn hw-btn-primary"
-                disabled={credits < car.price}
-                onClick={() => buyCarAction(car.id)}
-              >
-                Kopen
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-      {tab === "upgrades" && carInstance && (
-        <div>
-          <label>
-            Auto:
-            <select
-              value={selectedCar}
-              onChange={(e) => setSelectedCar(e.target.value)}
-              style={{ marginLeft: 8, padding: 8 }}
-            >
-              {ownedCars.map((c) => (
-                <option key={c.instanceId} value={c.instanceId}>
-                  {getCar(c.carId).name}
-                </option>
-              ))}
-            </select>
-          </label>
-          {upgrades.map((up) => {
-            const level = getUpgradeLevel(carInstance, up.id);
-            const price = getUpgradePrice(carInstance, up.id);
-            const maxed = level >= up.maxLevel;
-            return (
-              <div key={up.id} className="hw-car-card">
-                <strong>{up.name}</strong> (lvl {level}/{up.maxLevel})
-                <p>{up.description}</p>
-                {!maxed && (
-                  <>
-                    <p className="hw-credits">🛞 {price}</p>
-                    <button
-                      type="button"
-                      className="hw-btn hw-btn-primary"
-                      disabled={credits < price}
-                      onClick={() => buyUpgradeAction(selectedCar, up.id)}
-                    >
-                      Upgrade
-                    </button>
-                  </>
-                )}
+      <div className="shop-shelf hw-chrome-border">
+        {tab === "cars" && (
+          <div className="shop-car-list">
+            {purchasableCars.length === 0 && <p>Je hebt alle auto&apos;s!</p>}
+            {purchasableCars.map((car) => (
+              <div key={car.id} className="hw-blister-card">
+                <div className="blister-visual">
+                  <CarSvg carId={car.id} width={130} />
+                </div>
+                <div className="blister-body">
+                  <h3 className="blister-name">{car.name}</h3>
+                  <p className="blister-desc">{car.description}</p>
+                </div>
+                <div className="blister-action">
+                  <span className="blister-price">
+                    <WheelCreditIcon size={22} />
+                    {car.price}
+                  </span>
+                  <button
+                    type="button"
+                    className="hw-btn hw-btn-primary"
+                    disabled={credits < car.price}
+                    onClick={() => buyCarAction(car.id)}
+                  >
+                    Kopen
+                  </button>
+                </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+        {tab === "upgrades" && carInstance && (
+          <div>
+            <label className="shop-upgrade-select">
+              Auto:{" "}
+              <select
+                className="hw-select"
+                value={selectedCar}
+                onChange={(e) => setSelectedCar(e.target.value)}
+              >
+                {ownedCars.map((c) => (
+                  <option key={c.instanceId} value={c.instanceId}>
+                    {getCar(c.carId).name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {upgrades.map((up) => {
+              const lvl = getUpgradeLevel(carInstance, up.id);
+              const price = getUpgradePrice(carInstance, up.id);
+              const maxed = lvl >= up.maxLevel;
+              return (
+                <div key={up.id} className="hw-blister-card hw-blister-upgrade">
+                  <div
+                    className="blister-body"
+                    style={{ gridColumn: "1 / -1" }}
+                  >
+                    <h3 className="blister-name">
+                      {up.name}{" "}
+                      <span
+                        style={{
+                          fontSize: "0.85rem",
+                          color: "var(--hw-muted)",
+                        }}
+                      >
+                        (lvl {lvl}/{up.maxLevel})
+                      </span>
+                    </h3>
+                    <p className="blister-desc">{up.description}</p>
+                  </div>
+                  {!maxed && (
+                    <div
+                      className="blister-action"
+                      style={{ gridColumn: "1 / -1" }}
+                    >
+                      <span className="blister-price">
+                        <WheelCreditIcon size={22} />
+                        {price}
+                      </span>
+                      <button
+                        type="button"
+                        className="hw-btn hw-btn-primary"
+                        disabled={credits < price}
+                        onClick={() => buyUpgradeAction(selectedCar, up.id)}
+                      >
+                        Upgrade
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
       <button
         type="button"
-        className="hw-btn hw-btn-primary"
-        style={{ width: "100%", marginTop: 16 }}
+        className="hw-btn hw-btn-primary hw-btn-racing shop-race-btn"
         onClick={finishShop}
       >
-        Naar de race! 🏎️
+        Naar de race!
       </button>
-    </div>
+    </ScreenShell>
   );
 }

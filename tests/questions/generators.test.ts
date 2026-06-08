@@ -41,6 +41,12 @@ describe("question generators", () => {
     });
   });
 
+  it("varies categories within a round", () => {
+    const round = generateRoundQuestions(1, 99);
+    const types = new Set(round.map((q) => q.type));
+    expect(types.size).toBeGreaterThan(1);
+  });
+
   it("validates numeric answers", () => {
     const q = generateQuestion(1, 1, 0, "add_sub_30");
     expect(validateAnswer({ ...q, correctAnswer: 25 }, "25")).toBe(true);
@@ -52,5 +58,25 @@ describe("question generators", () => {
     const q = generateQuestion(2, 5, 0, "clock_visual");
     expect(q.display).toBe("clock");
     expect(q.visualData?.clockHour).toBeDefined();
+  });
+
+  it("uses visual clocks for half-hour and quarter categories", () => {
+    const half = generateQuestion(1, 5, 0, "clock_half_hour");
+    const quarter = generateQuestion(2, 5, 0, "clock_quarter");
+    expect(half.display).toBe("clock");
+    expect(quarter.display).toBe("clock");
+    expect(half.prompt).not.toContain("De klok wijst");
+    expect([0, 30]).toContain(half.visualData?.clockMinute);
+    expect([0, 15, 30, 45]).toContain(quarter.visualData?.clockMinute);
+  });
+
+  it("varies measure text prompts within a category", () => {
+    const prompts = new Set(
+      Array.from(
+        { length: 10 },
+        (_, i) => generateQuestion(1, 99, i, "measure_text").prompt,
+      ),
+    );
+    expect(prompts.size).toBeGreaterThan(5);
   });
 });

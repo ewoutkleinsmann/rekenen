@@ -18,16 +18,20 @@ export function MeasureVisual({ data }: Props) {
         .visual-measure { display: flex; justify-content: center; margin: 1rem 0; }
         .glass {
           position: relative; width: 80px; height: 140px;
-          border: 3px solid #88c; border-radius: 0 0 12px 12px;
-          background: rgba(255,255,255,0.1); overflow: hidden;
+          border: 3px solid var(--hw-orange, #ff6b00);
+          border-radius: 0 0 12px 12px;
+          background: rgba(255,255,255,0.15); overflow: hidden;
+          box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
         }
         .water {
           position: absolute; bottom: 0; left: 0; right: 0;
-          background: linear-gradient(180deg, #4fc3f7, #0288d1);
+          background: linear-gradient(180deg, var(--hw-light-blue, #009cde), var(--hw-blue, #0072ce));
         }
         .label {
           position: absolute; inset: 0; display: flex; align-items: center;
-          justify-content: center; font-weight: 700; text-shadow: 0 1px 2px #000;
+          justify-content: center; font-family: Rajdhani, sans-serif;
+          font-weight: 700; font-size: 1.1rem;
+          color: var(--hw-dark, #1a1a2e); text-shadow: 0 1px 2px rgba(255,255,255,0.5);
         }
       `}</style>
     </div>

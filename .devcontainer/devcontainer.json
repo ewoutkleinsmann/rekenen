@@ -25,6 +25,6 @@
       }
     }
   },
-  "remoteUser": "node",
+  "remoteUser": "root",
   "postCreateCommand": "if [ -f package.json ]; then pnpm install; fi"
 }

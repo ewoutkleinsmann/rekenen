@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useGameStore } from "../game/store";
 import { getLevel } from "../config/loadConfig";
 import { QuestionDisplay } from "../ui/QuestionDisplay";
+import { ScreenShell } from "../ui/ScreenShell";
+import { CheckeredFlagIcon } from "../ui/icons";
 
 export function QuizRound() {
   const roundState = useGameStore((s) => s.roundState);
@@ -12,6 +14,8 @@ export function QuizRound() {
   const [feedback, setFeedback] = useState<"ok" | "bad" | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const startRef = useRef(0);
+  const inputRef = useRef(input);
+  inputRef.current = input;
   const questionIndex = roundState?.questionIndex ?? 0;
   const question = questions[questionIndex];
   const levelConfig = getLevel(level);
@@ -19,11 +23,11 @@ export function QuizRound() {
   const goNext = useCallback(
     (remaining: number) => {
       if (!question) return;
-      submitAnswer(input, remaining);
+      submitAnswer(inputRef.current, remaining);
       setInput("");
       setFeedback(null);
     },
-    [input, question, submitAnswer],
+    [question, submitAnswer],
   );
 
   useEffect(() => {
@@ -60,37 +64,55 @@ export function QuizRound() {
   const backspace = () => setInput((v) => v.slice(0, -1));
 
   return (
-    <div className="quiz-round">
-      <div
+    <ScreenShell
+      variant="quiz"
+      className="quiz-round"
+      level={level}
+      credits={roundState.creditsThisRound}
+      badge="Quiz"
+    >
+      <p
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          textAlign: "center",
+          margin: "0 0 0.5rem",
+          fontFamily: "Rajdhani, sans-serif",
+          fontWeight: 600,
         }}
       >
-        <span>
-          Level {level}: {levelConfig.name}
-        </span>
-        <span className="hw-credits">🛞 {roundState.creditsThisRound}</span>
-      </div>
+        {levelConfig.name}
+      </p>
       <div className="hw-progress">
         {questions.map((_, i) => (
           <div
             key={i}
-            className={`hw-progress-dot ${i < questionIndex ? "done" : ""} ${i === questionIndex ? "current" : ""}`}
+            className={`hw-progress-segment ${i < questionIndex ? "done" : ""} ${i === questionIndex ? "current" : ""}`}
           />
         ))}
       </div>
-      <p style={{ textAlign: "center", color: "var(--hw-muted)" }}>
+      <p
+        style={{
+          textAlign: "center",
+          color: "var(--hw-muted)",
+          fontSize: "0.9rem",
+        }}
+      >
         Vraag {questionIndex + 1} / {questions.length}
       </p>
       <div className="hw-timer-bar">
         <div className="hw-timer-fill" style={{ width: `${pct}%` }} />
       </div>
-      <QuestionDisplay question={question} />
+      <div className="hw-panel-question question-area">
+        <QuestionDisplay question={question} />
+      </div>
       {feedback && (
         <p className={`hw-feedback ${feedback}`}>
-          {feedback === "ok" ? "Yes! 🏁" : "Mis! Probeer sneller!"}
+          {feedback === "ok" ? (
+            <>
+              <CheckeredFlagIcon size={28} /> Goed!
+            </>
+          ) : (
+            "Mis! Probeer sneller!"
+          )}
         </p>
       )}
       <input
@@ -120,6 +142,6 @@ export function QuizRound() {
           ),
         )}
       </div>
-    </div>
+    </ScreenShell>
   );
 }

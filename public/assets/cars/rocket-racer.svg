@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 48" role="img" aria-label="Rocket Racer">
+  <defs><linearGradient id="rr-body" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2ECC71"/><stop offset="100%" stop-color="#1A8C4E"/></linearGradient></defs>
+  <ellipse cx="20" cy="38" rx="10" ry="10" fill="#1A1A2E" stroke="#888" stroke-width="1.5"/>
+  <ellipse cx="20" cy="38" rx="4" ry="4" fill="#555"/>
+  <ellipse cx="85" cy="38" rx="10" ry="10" fill="#1A1A2E" stroke="#888" stroke-width="1.5"/>
+  <ellipse cx="85" cy="38" rx="4" ry="4" fill="#555"/>
+  <path d="M10 30 L25 20 L40 16 L70 14 L95 16 L108 22 L112 28 L105 32 L85 30 L40 28 L25 30 L10 32 Z" fill="url(#rr-body)" stroke="#FFE600" stroke-width="1"/>
+  <path d="M108 22 L118 18 L118 28 L108 28 Z" fill="#DA291C"/>
+  <path d="M112 28 C115 32 118 36 115 38" fill="none" stroke="#FF2D00" stroke-width="2"/>
+  <path d="M108 28 C110 33 112 37 109 39" fill="none" stroke="#FFE600" stroke-width="1.5"/>
+  <circle cx="50" cy="20" r="4" fill="#FF2D00"/>
+  <path d="M95 18 L108 16 L108 24 L95 22 Z" fill="#87CEEB" opacity="0.5"/>
+</svg>

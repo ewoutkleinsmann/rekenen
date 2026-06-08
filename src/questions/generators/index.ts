@@ -1,5 +1,5 @@
 import type { QuestionGenerator } from "../types";
-import { createPrng, randomInt, pickOne } from "../prng";
+import { createPrng, randomInt, pickOne, pickScenario } from "../prng";
 import { getQuestionTimeMs } from "../../quiz/time";
 import { getQuestionType } from "../../config/loadConfig";
 
@@ -103,53 +103,226 @@ const measureText: QuestionGenerator = (ctx) => {
   const rng = createPrng(ctx.seed + ctx.index * 43);
   const scenarios = [
     () => {
-      const jugs = randomInt(rng, 2, 5);
+      const a = randomInt(rng, 12, 35);
+      const b = randomInt(rng, 8, 25);
       return {
-        prompt: `Een emmer is 5 liter. ${jugs} emmers = ? liter`,
-        answer: jugs * 5,
+        prompt: `Een speelgoedauto is ${a} cm lang en een racebaan is ${b} cm lang. Hoeveel cm zijn ze samen?`,
+        answer: a + b,
       };
     },
     () => {
-      const packs = randomInt(rng, 2, 6);
+      const long = randomInt(rng, 30, 60);
+      const short = randomInt(rng, 10, long - 5);
       return {
-        prompt: `Een pak melk is 1 liter. ${packs} pakken = ? liter`,
-        answer: packs,
+        prompt: `Een tafel is ${long} cm lang en een stoel is ${short} cm breed. Hoeveel cm langer is de tafel?`,
+        answer: long - short,
       };
     },
     () => {
-      const cm = randomInt(rng, 2, 8) * 10;
+      const bags = randomInt(rng, 2, 5);
       return {
-        prompt: `Een liniaal is ${cm} cm. 2 linialen = ? cm`,
-        answer: cm * 2,
+        prompt: `Een zak suiker weegt 1 kg. Je koopt ${bags} zakken. Hoeveel kg is dat samen?`,
+        answer: bags,
+      };
+    },
+    () => {
+      const milk = 1;
+      const fruit = randomInt(rng, 1, 3);
+      return {
+        prompt: `Een pak melk weegt ${milk} kg en een mandarijnenzak weegt ${fruit} kg. Hoeveel kg samen?`,
+        answer: milk + fruit,
+      };
+    },
+    () => {
+      const cans = randomInt(rng, 2, 6);
+      return {
+        prompt: `In een kannetje past 1 liter water. Je vult ${cans} kannetjes voor de wasstraat. Hoeveel liter is dat?`,
+        answer: cans,
+      };
+    },
+    () => {
+      const total = randomInt(rng, 5, 12);
+      const poured = randomInt(rng, 1, total - 1);
+      return {
+        prompt: `Je hebt ${total} liter water in een emmer. Je giet ${poured} liter in een gieter. Hoeveel liter blijft over?`,
+        answer: total - poured,
+      };
+    },
+    () => {
+      const perBottle = randomInt(rng, 2, 4);
+      const bottles = randomInt(rng, 2, 5);
+      return {
+        prompt: `Elke fles race-olie bevat ${perBottle} liter. Je hebt ${bottles} flessen. Hoeveel liter olie is dat?`,
+        answer: perBottle * bottles,
+      };
+    },
+    () => {
+      const ruler = randomInt(rng, 2, 4) * 10;
+      const count = randomInt(rng, 2, 4);
+      return {
+        prompt: `Een liniaal is ${ruler} cm. Je legt ${count} linialen achter elkaar. Hoeveel cm is dat?`,
+        answer: ruler * count,
+      };
+    },
+    () => {
+      const table = randomInt(rng, 4, 8) * 10;
+      return {
+        prompt: `Een tafel is ${table} cm breed. Hoeveel cm moet je erbij doen om 1 meter (100 cm) te krijgen?`,
+        answer: 100 - table,
+      };
+    },
+    () => {
+      const buckets = randomInt(rng, 3, 7);
+      const perBucket = 5;
+      return {
+        prompt: `Met een emmer schep je ${perBucket} liter uit het zwembad. Je vult ${buckets} emmers. Hoeveel liter is dat?`,
+        answer: buckets * perBucket,
+      };
+    },
+    () => {
+      const jump = randomInt(rng, 2, 5) * 10;
+      const jumps = randomInt(rng, 2, 4);
+      return {
+        prompt: `Op de meetlat spring je steeds ${jump} cm verder. Na ${jumps} sprongen vanaf 0 cm, waar ben je?`,
+        answer: jump * jumps,
+      };
+    },
+    () => {
+      const apples = randomInt(rng, 3, 8);
+      const perApple = randomInt(rng, 1, 2) * 100;
+      return {
+        prompt: `Een appel weegt ongeveer ${perApple} gram. Je weegt ${apples} appels (allemaal even zwaar). Hoeveel gram is dat?`,
+        answer: apples * perApple,
       };
     },
   ];
-  const s = pickOne(rng, scenarios)();
+  const s = pickScenario(ctx.seed, ctx.index, 43, scenarios);
   return baseQuestion(ctx, "measure_text", s.prompt, s.answer);
 };
 
 const measureConvert: QuestionGenerator = (ctx) => {
   const rng = createPrng(ctx.seed + ctx.index * 47);
-  const dl = randomInt(rng, 2, 9);
-  const prompt = `${dl} dL = ? cL (1 dL = 10 cL)`;
-  return baseQuestion(ctx, "measure_convert", prompt, dl * 10);
+  const scenarios = [
+    () => {
+      const dl = randomInt(rng, 2, 9);
+      return {
+        prompt: `Een beker bevat ${dl} deciliter. Hoeveel centiliter is dat? (1 dL = 10 cL)`,
+        answer: dl * 10,
+      };
+    },
+    () => {
+      const meters = randomInt(rng, 1, 5);
+      return {
+        prompt: `Een springplank is ${meters} meter lang. Hoeveel centimeter is dat? (1 m = 100 cm)`,
+        answer: meters * 100,
+      };
+    },
+    () => {
+      const cl = randomInt(rng, 2, 9) * 10;
+      return {
+        prompt: `Een flesje heeft ${cl} centiliter limonade. Hoeveel deciliter is dat? (10 cL = 1 dL)`,
+        answer: cl / 10,
+      };
+    },
+    () => {
+      const dm = randomInt(rng, 3, 9);
+      return {
+        prompt: `Een stickerstrip is ${dm} decimeter. Hoeveel centimeter is dat? (1 dm = 10 cm)`,
+        answer: dm * 10,
+      };
+    },
+  ];
+  const s = pickScenario(ctx.seed, ctx.index, 47, scenarios);
+  return baseQuestion(ctx, "measure_convert", s.prompt, s.answer);
 };
 
 const measureStory: QuestionGenerator = (ctx) => {
   const rng = createPrng(ctx.seed + ctx.index * 53);
-  const cups = randomInt(rng, 3, 8);
-  const perCup = 2;
-  const prompt = `Je vult ${cups} kopjes met elk ${perCup} dL water. Hoeveel dL is dat samen?`;
-  return baseQuestion(ctx, "measure_story", prompt, cups * perCup);
+  const scenarios = [
+    () => {
+      const cups = randomInt(rng, 3, 8);
+      const perCup = 2;
+      return {
+        prompt: `Voor de pitstop vul je ${cups} bekers met elk ${perCup} dL sportdrank. Hoeveel dL is dat samen?`,
+        answer: cups * perCup,
+      };
+    },
+    () => {
+      const bottles = randomInt(rng, 2, 5);
+      const perBottle = 3;
+      return {
+        prompt: `Elke bidon bevat ${perBottle} dL water. De coureur drinkt ${bottles} bidons leeg. Hoeveel dL drinkt hij?`,
+        answer: bottles * perBottle,
+      };
+    },
+    () => {
+      const pieces = randomInt(rng, 4, 9);
+      const perPiece = 10;
+      return {
+        prompt: `Je bouwt een racebaan van stukken van ${perPiece} cm. Je gebruikt ${pieces} stukken. Hoeveel cm baan is dat?`,
+        answer: pieces * perPiece,
+      };
+    },
+    () => {
+      const start = randomInt(rng, 20, 50);
+      const added = randomInt(rng, 10, 30);
+      return {
+        prompt: `Een auto is ${start} cm lang. Met een spoiler erbij wordt hij ${added} cm langer. Hoe lang is de auto nu?`,
+        answer: start + added,
+      };
+    },
+  ];
+  const s = pickScenario(ctx.seed, ctx.index, 53, scenarios);
+  return baseQuestion(ctx, "measure_story", s.prompt, s.answer);
 };
 
 const moneyCents: QuestionGenerator = (ctx) => {
   const rng = createPrng(ctx.seed + ctx.index * 59);
-  const coins = [randomInt(rng, 1, 5), randomInt(rng, 1, 4)];
-  const values = [20, 10];
-  const total = coins[0]! * values[0]! + coins[1]! * values[1]!;
-  const prompt = `Je hebt ${coins[0]}×20ct en ${coins[1]}×10ct. Hoeveel cent is dat?`;
-  return baseQuestion(ctx, "money_cents", prompt, total);
+  const scenarios = [
+    () => {
+      const n20 = randomInt(rng, 1, 5);
+      const n10 = randomInt(rng, 1, 4);
+      return {
+        prompt: `In je portemonnee zitten ${n20} munten van 20 cent en ${n10} munten van 10 cent. Hoeveel cent heb je?`,
+        answer: n20 * 20 + n10 * 10,
+      };
+    },
+    () => {
+      const n50 = randomInt(rng, 1, 3);
+      const n20 = randomInt(rng, 0, 3);
+      const n10 = randomInt(rng, 1, 4);
+      return {
+        prompt: `Je spaart: ${n50}×50ct, ${n20}×20ct en ${n10}×10ct. Hoeveel cent is dat samen?`,
+        answer: n50 * 50 + n20 * 20 + n10 * 10,
+      };
+    },
+    () => {
+      const price = randomInt(rng, 2, 6) * 25;
+      const paid = price + randomInt(rng, 1, 3) * 25;
+      return {
+        prompt: `Een sticker kost ${price} cent. Je betaalt met ${paid} cent. Hoeveel cent wisselgeld krijg je?`,
+        answer: paid - price,
+      };
+    },
+    () => {
+      const target = randomInt(rng, 3, 8) * 10;
+      const have = randomInt(rng, 1, target / 10 - 1) * 10;
+      return {
+        prompt: `Je wilt ${target} cent sparen. Je hebt al ${have} cent. Hoeveel cent moet je er nog bij sparen?`,
+        answer: target - have,
+      };
+    },
+    () => {
+      const packs = randomInt(rng, 2, 5);
+      const perPack = randomInt(rng, 2, 4) * 10;
+      return {
+        prompt: `Een pak gum kost ${perPack} cent. Je koopt ${packs} pakken. Hoeveel cent betaal je?`,
+        answer: packs * perPack,
+      };
+    },
+  ];
+  const s = pickScenario(ctx.seed, ctx.index, 59, scenarios);
+  return baseQuestion(ctx, "money_cents", s.prompt, s.answer);
 };
 
 const moneyMixed: QuestionGenerator = (ctx) => {
@@ -168,44 +341,31 @@ const moneyStory: QuestionGenerator = (ctx) => {
   return baseQuestion(ctx, "money_story", prompt, paid - price);
 };
 
-const clockHalfHour: QuestionGenerator = (ctx) => {
-  const rng = createPrng(ctx.seed + ctx.index * 71);
-  const hour = randomInt(rng, 1, 12);
-  const half = rng() > 0.5;
-  const minute = half ? 30 : 0;
-  const prompt = half
-    ? `De klok wijst ${hour} uur half. Hoe laat is het? (schrijf als HHMM, bv. 930)`
-    : `De klok wijst ${hour} uur. Hoe laat is het? (schrijf als HHMM, bv. 900)`;
-  const answer = hour * 100 + minute;
-  return baseQuestion(ctx, "clock_half_hour", prompt, answer);
-};
-
-const clockQuarter: QuestionGenerator = (ctx) => {
-  const rng = createPrng(ctx.seed + ctx.index * 73);
-  const hour = randomInt(rng, 1, 12);
-  const quarters = [0, 15, 30, 45];
-  const minute = pickOne(rng, quarters);
-  const prompt = `Hoe laat is het als de minutenwijzer op ${minute} staat en het is ${hour} uur? (HHMM)`;
-  return baseQuestion(ctx, "clock_quarter", prompt, hour * 100 + minute);
-};
-
-const clockVisual: QuestionGenerator = (ctx) => {
-  const rng = createPrng(ctx.seed + ctx.index * 79);
-  const hour = randomInt(rng, 1, 12);
-  const minute = pickOne(rng, [0, 15, 30, 45]);
-  return baseQuestion(
-    ctx,
-    "clock_visual",
-    "Hoe laat is het op de klok? (HHMM)",
-    hour * 100 + minute,
-    "clock",
-    {
+function makeClockVisual(
+  typeId: string,
+  allowedMinutes: number[],
+  seedOffset: number,
+): QuestionGenerator {
+  return (ctx) => {
+    const rng = createPrng(ctx.seed + ctx.index * seedOffset);
+    const hour = randomInt(rng, 1, 12);
+    const minute = pickOne(rng, allowedMinutes);
+    const prompt = pickOne(rng, [
+      "Hoe laat is het op de klok? (HHMM)",
+      "Kijk naar de klok. Hoe laat is het? (HHMM)",
+      "Wat is de tijd op de klok? (HHMM)",
+    ]);
+    return baseQuestion(ctx, typeId, prompt, hour * 100 + minute, "clock", {
       clockHour: hour,
       clockMinute: minute,
       clockStyle: pickOne(rng, ["analog", "digital"]),
-    },
-  );
-};
+    });
+  };
+}
+
+const clockHalfHour = makeClockVisual("clock_half_hour", [0, 30], 71);
+const clockQuarter = makeClockVisual("clock_quarter", [0, 15, 30, 45], 73);
+const clockVisual = makeClockVisual("clock_visual", [0, 15, 30, 45], 79);
 
 const moneyVisual: QuestionGenerator = (ctx) => {
   const coins = [20, 20, 10, 5, 5];

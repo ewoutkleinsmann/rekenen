@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 48" role="img" aria-label="Grip GT">
+  <defs><linearGradient id="gg-body" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#009CDE"/><stop offset="100%" stop-color="#0072CE"/></linearGradient></defs>
+  <ellipse cx="22" cy="38" rx="11" ry="11" fill="#1A1A2E" stroke="#888" stroke-width="1.5"/>
+  <ellipse cx="22" cy="38" rx="4" ry="4" fill="#555"/>
+  <ellipse cx="92" cy="38" rx="11" ry="11" fill="#1A1A2E" stroke="#888" stroke-width="1.5"/>
+  <ellipse cx="92" cy="38" rx="4" ry="4" fill="#555"/>
+  <path d="M12 32 L28 24 L45 20 L80 18 L105 20 L112 26 L108 32 L95 30 L45 30 L28 32 L12 34 Z" fill="url(#gg-body)" stroke="#FFE600" stroke-width="1"/>
+  <path d="M45 20 L80 18 L82 24 L48 26 Z" fill="#0056B3"/>
+  <rect x="50" y="22" width="25" height="4" fill="#fff" opacity="0.3" rx="1"/>
+  <path d="M100 22 L110 20 L110 28 L100 28 Z" fill="#87CEEB" opacity="0.6"/>
+  <line x1="30" y1="28" x2="90" y2="26" stroke="#FFE600" stroke-width="2"/>
+</svg>

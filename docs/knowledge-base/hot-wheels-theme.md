@@ -1,6 +1,13 @@
 # Hot Wheels thema
 
-Geïnspireerd door Hot Wheels Track Builder — **geen** officiële Mattel-assets of logo's.
+Hobbyproject voor eigen gebruik met **officiële Hot Wheels/Mattel-branding**.
+
+## Branding-beleid
+
+- Officieel Hot Wheels-logo op title screen en favicon
+- Mattel-kleuren (Pantone → hex) in CSS tokens
+- Wheel Credits-icoon afgeleid van officiële flame-wheel
+- Assets lokaal in `public/assets/brand/`
 
 ## UI-termen
 
@@ -20,10 +27,45 @@ Geïnspireerd door Hot Wheels Track Builder — **geen** officiële Mattel-asset
 | jump     | Min. snelheid, max. gewicht      |
 | rocket   | Vereist Baan Blaster upgrade     |
 
-## Kleuren
+## Kleuren (officiële Mattel-waarden)
 
-- Oranje `#FF6B00`, blauw `#0056B3`, geel `#FFD100`, flame `#FF2D00`
+| Token             | Hex       | Pantone    |
+| ----------------- | --------- | ---------- |
+| Flame red         | `#DA291C` | PMS 485 C  |
+| Hot Wheels yellow | `#FFE600` | PMS 116 C  |
+| Brand blue        | `#0072CE` | PMS 285 C  |
+| Light blue        | `#009CDE` | PMS 2925 C |
+| Track orange      | `#FF6B00` | —          |
+| Track highlight   | `#FF8C33` | —          |
+| Flame hot         | `#FF2D00` | —          |
+| Dark ink          | `#1A1A2E` | —          |
+
+## Typografie
+
+- **Display/titels:** Rajdhani Bold Italic (Google Fonts)
+- **Body/vragen:** Fredoka SemiBold (Google Fonts)
+- **Logo:** officieel SVG-wordmark (`HotWheelsLogo` component)
+
+## Assets
+
+```
+public/assets/
+├── brand/          # hot-wheels-logo, wheel, flame, mattel
+├── icons/          # segment-iconen, wheel-credit, trophy, vlag
+├── cars/           # 5 auto-illustraties (per carId)
+├── decor/          # speed-lines, loop-arch, garage-floor
+└── backgrounds/    # sky-gradient
+```
 
 ## Auto-stats
 
 speed, acceleration, handling, grip, boost, weight (lager = beter bij sprongen)
+
+Stat-kleuren in UI: snelheid=rood, grip=groen, boost=paars, handling=blauw
+
+## Animaties
+
+- Correct antwoord: groene burst (`hw-burst`)
+- Fout antwoord: zachte rode pulse (`hw-pulse-red`)
+- Scherm-transitie: fade-in (`hw-fade-in`)
+- Win screen: checkered wipe

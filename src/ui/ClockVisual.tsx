@@ -18,19 +18,45 @@ export function ClockVisual({ data }: Props) {
         <span>
           {h}:{m}
         </span>
+        <style>{`
+          .visual-clock.digital {
+            font-size: 2.5rem; font-weight: 700; text-align: center;
+            color: var(--hw-yellow, #ffe600);
+            font-family: Rajdhani, sans-serif;
+            font-variant-numeric: tabular-nums;
+            padding: 1rem; background: var(--hw-dark, #1a1a2e);
+            border: 3px solid var(--hw-orange, #ff6b00);
+            border-radius: 8px;
+            max-width: 200px; margin: 0 auto;
+          }
+        `}</style>
       </div>
     );
   }
 
   return (
-    <svg viewBox="0 0 120 120" className="visual-clock analog" aria-hidden>
+    <svg
+      viewBox="0 0 120 120"
+      className="visual-clock analog"
+      aria-hidden
+      style={{ width: 140, height: 140, display: "block", margin: "0 auto" }}
+    >
       <circle
         cx="60"
         cy="60"
         r="55"
         fill="#fff"
-        stroke="#333"
+        stroke="#1a1a2e"
         strokeWidth="3"
+      />
+      <circle
+        cx="60"
+        cy="60"
+        r="52"
+        fill="none"
+        stroke="#ff6b00"
+        strokeWidth="1"
+        opacity="0.3"
       />
       {[...Array(12)].map((_, i) => {
         const a = (i * 30 * Math.PI) / 180;
@@ -41,7 +67,7 @@ export function ClockVisual({ data }: Props) {
             y1={60 + 45 * Math.sin(a - Math.PI / 2)}
             x2={60 + 50 * Math.cos(a - Math.PI / 2)}
             y2={60 + 50 * Math.sin(a - Math.PI / 2)}
-            stroke="#333"
+            stroke="#1a1a2e"
             strokeWidth="2"
           />
         );
@@ -51,7 +77,7 @@ export function ClockVisual({ data }: Props) {
         y1="60"
         x2={60 + 28 * Math.cos((hourAngle * Math.PI) / 180)}
         y2={60 + 28 * Math.sin((hourAngle * Math.PI) / 180)}
-        stroke="#0056b3"
+        stroke="#0072ce"
         strokeWidth="4"
         strokeLinecap="round"
       />
@@ -64,7 +90,7 @@ export function ClockVisual({ data }: Props) {
         strokeWidth="3"
         strokeLinecap="round"
       />
-      <circle cx="60" cy="60" r="4" fill="#333" />
+      <circle cx="60" cy="60" r="4" fill="#da291c" />
     </svg>
   );
 }

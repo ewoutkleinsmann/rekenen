@@ -41,4 +41,4 @@ pnpm preview
 - Race-uitkomst is deterministisch op basis van auto-stats + baan
 - Voortgang wordt opgeslagen in `localStorage`
 
-Geïnspireerd door Hot Wheels — geen officiële Mattel-assets.
+Hot Wheels hobbyproject met officiële Mattel-branding (eigen gebruik).
