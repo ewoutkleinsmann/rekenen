@@ -1,6 +1,6 @@
-# Rekenen
+# Hot Wheels Rekenspel
 
-A math game built as a React SPA with Vite.
+Een rekenspel voor groep 4 met Hot Wheels-thema. Maak timed sommen, verdien Wheel Credits, koop auto's en upgrades, en race over de baan!
 
 ## Setup
 
@@ -14,7 +14,11 @@ pnpm install
 pnpm dev
 ```
 
-Opens at [http://localhost:5173](http://localhost:5173) with live reload (HMR).
+## Tests
+
+```bash
+pnpm test
+```
 
 ## Build
 
@@ -22,3 +26,19 @@ Opens at [http://localhost:5173](http://localhost:5173) with live reload (HMR).
 pnpm build
 pnpm preview
 ```
+
+## Structuur
+
+- `config/` — levels, auto's, upgrades, banen, scoring (JSON)
+- `docs/knowledge-base/` — spelregels en curriculum
+- `src/` — React app met quiz, shop, race-simulatie
+- `tests/` — Vitest unit tests
+
+## Spelregels
+
+- 10 sommen per ronde met variabele tijd per somsoort
+- Punten → Wheel Credits → auto's/upgrades
+- Race-uitkomst is deterministisch op basis van auto-stats + baan
+- Voortgang wordt opgeslagen in `localStorage`
+
+Geïnspireerd door Hot Wheels — geen officiële Mattel-assets.

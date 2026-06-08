@@ -1,0 +1,67 @@
+{
+  "types": {
+    "add_sub_30": { "label": "Optellen/aftrekken tot 30", "timeFactor": 0.85 },
+    "measure_text": { "label": "Meten (tekst)", "timeFactor": 1.2 },
+    "money_cents": { "label": "Geld in centen", "timeFactor": 1.0 },
+    "clock_half_hour": { "label": "Klok hele/halve uren", "timeFactor": 1.0 },
+    "clock_visual": {
+      "label": "Klok (visueel)",
+      "timeFactor": 1.1,
+      "display": "clock"
+    },
+    "tens_to_100": { "label": "Tientallen tot 100", "timeFactor": 0.75 },
+    "clock_quarter": { "label": "Klok kwartieren", "timeFactor": 1.05 },
+    "add_sub_from_ten": {
+      "label": "Optellen/aftrekken vanuit tiental",
+      "timeFactor": 0.85
+    },
+    "add_sub_100": {
+      "label": "Optellen/aftrekken tot 100",
+      "timeFactor": 0.85
+    },
+    "table_2": { "label": "Tafel van 2", "timeFactor": 0.55 },
+    "table_10": { "label": "Tafel van 10", "timeFactor": 0.55 },
+    "table_5": { "label": "Tafel van 5", "timeFactor": 0.55 },
+    "table_1": { "label": "Tafel van 1", "timeFactor": 0.5 },
+    "table_3": { "label": "Tafel van 3", "timeFactor": 0.55 },
+    "table_4": { "label": "Tafel van 4", "timeFactor": 0.55 },
+    "table_6": { "label": "Tafel van 6", "timeFactor": 0.55 },
+    "table_8": { "label": "Tafel van 8", "timeFactor": 0.55 },
+    "table_mult": { "label": "Tafelsom", "timeFactor": 0.55 },
+    "measure_convert": {
+      "label": "Lengte/inhoud omrekenen",
+      "timeFactor": 1.25
+    },
+    "measure_visual": {
+      "label": "Meten (visueel)",
+      "timeFactor": 1.3,
+      "display": "measure"
+    },
+    "measure_story": { "label": "Verhaaltjessom meten", "timeFactor": 1.4 },
+    "add_sub_tens": {
+      "label": "Optellen/aftrekken tientallen",
+      "timeFactor": 0.8
+    },
+    "duration_minutes": { "label": "Tijdsduur in minuten", "timeFactor": 1.15 },
+    "money_mixed": { "label": "Geld biljetten en munten", "timeFactor": 1.2 },
+    "money_visual": {
+      "label": "Geld (visueel)",
+      "timeFactor": 1.25,
+      "display": "money"
+    },
+    "money_story": { "label": "Verhaaltjessom geld", "timeFactor": 1.35 },
+    "add_sub_1000": {
+      "label": "Optellen/aftrekken tot 1000",
+      "timeFactor": 0.9
+    },
+    "skip_count_7": { "label": "Sprongen van 7", "timeFactor": 0.7 },
+    "skip_count_9": { "label": "Sprongen van 9", "timeFactor": 0.7 },
+    "skip_count_100": { "label": "Sprongen van 100", "timeFactor": 0.65 },
+    "skip_count_10_100": {
+      "label": "Sprongen van 10 en 100",
+      "timeFactor": 0.7
+    },
+    "table_read": { "label": "Tabel aflezen", "timeFactor": 1.2 },
+    "table_fill_gap": { "label": "Tabel invullen", "timeFactor": 1.2 }
+  }
+}

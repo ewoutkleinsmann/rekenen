@@ -1,0 +1,9 @@
+{
+  "baseCorrect": 50,
+  "maxTimeBonus": 50,
+  "questionsPerRound": 10,
+  "minTimeMs": 4000,
+  "maxTimeMs": 25000,
+  "startingCredits": 0,
+  "starterCarId": "booster-blaze"
+}

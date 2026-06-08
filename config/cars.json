@@ -1,0 +1,81 @@
+{
+  "cars": [
+    {
+      "id": "booster-blaze",
+      "name": "Booster Blaze",
+      "description": "Razendsnel op rechte stukken en boosters!",
+      "price": 0,
+      "stats": {
+        "speed": 75,
+        "acceleration": 70,
+        "handling": 45,
+        "grip": 50,
+        "boost": 85,
+        "weight": 55
+      },
+      "trait": { "boosterBonus": 0.15 }
+    },
+    {
+      "id": "grip-gt",
+      "name": "Grip GT",
+      "description": "Blijft vast in bochten en loops.",
+      "price": 120,
+      "stats": {
+        "speed": 55,
+        "acceleration": 60,
+        "handling": 80,
+        "grip": 85,
+        "boost": 50,
+        "weight": 60
+      },
+      "trait": { "loopGripBonus": 10 }
+    },
+    {
+      "id": "jump-jet",
+      "name": "Jump Jet",
+      "description": "Licht en snel van de start, perfect voor sprongen.",
+      "price": 150,
+      "stats": {
+        "speed": 65,
+        "acceleration": 85,
+        "handling": 60,
+        "grip": 55,
+        "boost": 60,
+        "weight": 35
+      },
+      "trait": { "jumpBonus": 0.2 }
+    },
+    {
+      "id": "loop-king",
+      "name": "Loop King",
+      "description": "Koning van de loop-the-loop!",
+      "price": 200,
+      "stats": {
+        "speed": 70,
+        "acceleration": 65,
+        "handling": 70,
+        "grip": 75,
+        "boost": 45,
+        "weight": 50
+      },
+      "trait": { "loopSpeedBonus": 8 }
+    },
+    {
+      "id": "rocket-racer",
+      "name": "Rocket Racer",
+      "description": "Ontgrendeld met Baan Blaster upgrades.",
+      "price": 250,
+      "stats": {
+        "speed": 80,
+        "acceleration": 75,
+        "handling": 55,
+        "grip": 60,
+        "boost": 70,
+        "weight": 45
+      },
+      "trait": { "rocketBonus": 0.25 }
+    }
+  ],
+  "statMax": 100,
+  "statMin": 10
+}

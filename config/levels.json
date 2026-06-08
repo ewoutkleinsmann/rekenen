@@ -1,0 +1,150 @@
+{
+  "levels": [
+    {
+      "id": 1,
+      "blok": 1,
+      "name": "Rookie Rally",
+      "baseTimeMs": 15000,
+      "questionCategories": [
+        "add_sub_30",
+        "measure_text",
+        "money_cents",
+        "clock_half_hour"
+      ],
+      "trackId": "track-01"
+    },
+    {
+      "id": 2,
+      "blok": 2,
+      "name": "Speedway Sprint",
+      "baseTimeMs": 14000,
+      "questionCategories": [
+        "add_sub_30",
+        "measure_text",
+        "money_cents",
+        "clock_half_hour",
+        "tens_to_100",
+        "clock_quarter",
+        "add_sub_from_ten",
+        "clock_visual"
+      ],
+      "trackId": "track-02"
+    },
+    {
+      "id": 3,
+      "blok": 3,
+      "name": "Turbo Track",
+      "baseTimeMs": 13000,
+      "questionCategories": [
+        "add_sub_30",
+        "measure_text",
+        "money_cents",
+        "clock_half_hour",
+        "tens_to_100",
+        "clock_quarter",
+        "add_sub_from_ten",
+        "add_sub_100",
+        "table_2",
+        "table_10",
+        "money_visual"
+      ],
+      "trackId": "track-03"
+    },
+    {
+      "id": 4,
+      "blok": 4,
+      "name": "Curve Crusher",
+      "baseTimeMs": 12000,
+      "questionCategories": [
+        "tens_to_100",
+        "clock_quarter",
+        "add_sub_from_ten",
+        "add_sub_100",
+        "table_2",
+        "table_10",
+        "table_5",
+        "table_1",
+        "measure_convert",
+        "add_sub_tens",
+        "measure_visual"
+      ],
+      "trackId": "track-04"
+    },
+    {
+      "id": 5,
+      "blok": 5,
+      "name": "Loop Launcher",
+      "baseTimeMs": 11000,
+      "questionCategories": [
+        "add_sub_100",
+        "table_2",
+        "table_10",
+        "table_5",
+        "table_1",
+        "measure_convert",
+        "add_sub_tens",
+        "table_3"
+      ],
+      "trackId": "track-05"
+    },
+    {
+      "id": 6,
+      "blok": 6,
+      "name": "Booster Boulevard",
+      "baseTimeMs": 10000,
+      "questionCategories": [
+        "table_3",
+        "add_sub_100",
+        "table_4",
+        "table_8",
+        "duration_minutes"
+      ],
+      "trackId": "track-06"
+    },
+    {
+      "id": 7,
+      "blok": 7,
+      "name": "Grip Gauntlet",
+      "baseTimeMs": 9000,
+      "questionCategories": [
+        "table_4",
+        "table_8",
+        "duration_minutes",
+        "table_6",
+        "money_mixed",
+        "add_sub_1000"
+      ],
+      "trackId": "track-07"
+    },
+    {
+      "id": 8,
+      "blok": 8,
+      "name": "Jump Junction",
+      "baseTimeMs": 8000,
+      "questionCategories": [
+        "table_6",
+        "money_mixed",
+        "add_sub_1000",
+        "skip_count_7",
+        "skip_count_100",
+        "add_sub_100"
+      ],
+      "trackId": "track-08"
+    },
+    {
+      "id": 9,
+      "blok": 9,
+      "name": "Champion Circuit",
+      "baseTimeMs": 7000,
+      "questionCategories": [
+        "skip_count_7",
+        "skip_count_100",
+        "add_sub_100",
+        "skip_count_9",
+        "skip_count_10_100",
+        "table_read"
+      ],
+      "trackId": "track-09"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "tracks": [
+    {
+      "id": "track-01",
+      "name": "Orange Loop Starter",
+      "segments": [
+        { "type": "straight", "length": 80 },
+        { "type": "curve", "radius": 50, "angle": 60, "minGrip": 25 },
+        { "type": "straight", "length": 60 },
+        { "type": "booster", "boostMultiplier": 1.3 }
+      ],
+      "finishCondition": "complete_all_segments"
+    },
+    {
+      "id": "track-02",
+      "name": "Blue Curve Challenge",
+      "segments": [
+        { "type": "straight", "length": 70 },
+        { "type": "curve", "radius": 40, "angle": 90, "minGrip": 35 },
+        { "type": "straight", "length": 50 },
+        { "type": "curve", "radius": 45, "angle": 75, "minGrip": 30 },
+        { "type": "booster", "boostMultiplier": 1.4 }
+      ],
+      "finishCondition": "complete_all_segments"
+    },
+    {
+      "id": "track-03",
+      "name": "Turbo Straight",
+      "segments": [
+        { "type": "straight", "length": 100 },
+        { "type": "booster", "boostMultiplier": 1.5 },
+        { "type": "straight", "length": 80 },
+        { "type": "curve", "radius": 35, "angle": 90, "minGrip": 40 }
+      ],
+      "finishCondition": "complete_all_segments"
+    },
+    {
+      "id": "track-04",
+      "name": "Measure Mountain",
+      "segments": [
+        { "type": "straight", "length": 60 },
+        { "type": "curve", "radius": 38, "angle": 90, "minGrip": 42 },
+        { "type": "jump", "length": 40, "minSpeed": 55, "maxWeight": 65 },
+        { "type": "straight", "length": 50 },
+        { "type": "booster", "boostMultiplier": 1.5 }
+      ],
+      "finishCondition": "complete_all_segments"
+    },
+    {
+      "id": "track-05",
+      "name": "Loop de Loop",
+      "segments": [
+        { "type": "straight", "length": 80 },
+        { "type": "booster", "boostMultiplier": 1.6 },
+        { "type": "loop", "radius": 25, "minEntrySpeed": 70, "minGrip": 50 },
+        { "type": "straight", "length": 60 }
+      ],
+      "finishCondition": "complete_all_segments"
+    },
+    {
+      "id": "track-06",
+      "name": "Double Booster Dash",
+      "segments": [
+        { "type": "straight", "length": 50 },
+        { "type": "booster", "boostMultiplier": 1.5 },
+        { "type": "curve", "radius": 42, "angle": 80, "minGrip": 45 },
+        { "type": "booster", "boostMultiplier": 1.4 },
+        { "type": "jump", "length": 35, "minSpeed": 60, "maxWeight": 60 }
+      ],
+      "finishCondition": "complete_all_segments"
+    },
+    {
+      "id": "track-07",
+      "name": "Grip Gauntlet Pro",
+      "segments": [
+        { "type": "straight", "length": 60 },
+        { "type": "curve", "radius": 32, "angle": 100, "minGrip": 55 },
+        { "type": "loop", "radius": 22, "minEntrySpeed": 78, "minGrip": 58 },
+        { "type": "curve", "radius": 35, "angle": 90, "minGrip": 50 }
+      ],
+      "finishCondition": "complete_all_segments"
+    },
+    {
+      "id": "track-08",
+      "name": "Rocket Ramp",
+      "segments": [
+        { "type": "straight", "length": 70 },
+        { "type": "booster", "boostMultiplier": 1.6 },
+        { "type": "jump", "length": 50, "minSpeed": 65, "maxWeight": 55 },
+        { "type": "rocket", "boostMultiplier": 1.8 },
+        { "type": "straight", "length": 60 }
+      ],
+      "finishCondition": "complete_all_segments"
+    },
+    {
+      "id": "track-09",
+      "name": "Champion's Crown",
+      "segments": [
+        { "type": "straight", "length": 50 },
+        { "type": "booster", "boostMultiplier": 1.7 },
+        { "type": "curve", "radius": 30, "angle": 110, "minGrip": 60 },
+        { "type": "loop", "radius": 20, "minEntrySpeed": 82, "minGrip": 62 },
+        { "type": "jump", "length": 45, "minSpeed": 70, "maxWeight": 50 },
+        { "type": "rocket", "boostMultiplier": 2.0 },
+        { "type": "straight", "length": 40 }
+      ],
+      "finishCondition": "complete_all_segments"
+    }
+  ]
+}
