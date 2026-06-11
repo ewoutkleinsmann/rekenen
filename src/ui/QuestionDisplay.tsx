@@ -21,8 +21,12 @@ export function QuestionDisplay({ question }: Props) {
         <MeasureVisual data={question.visualData} />
       )}
       <style>{`
+        .question-panel {
+          display: flex; flex-direction: column; align-items: center;
+          gap: 1.25rem;
+        }
         .question-prompt {
-          font-size: 1.35rem; text-align: center; margin: 0 0 0.5rem;
+          font-size: 1.5rem; line-height: 1.3; text-align: center; margin: 0;
           font-family: Fredoka, sans-serif; font-weight: 600;
           color: var(--hw-question-text, #1a1a2e);
         }

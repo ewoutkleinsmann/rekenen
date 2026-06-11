@@ -5,6 +5,7 @@ import { validateAnswer } from "../questions/registry";
 import { QuestionDisplay } from "../ui/QuestionDisplay";
 import { ScreenShell } from "../ui/ScreenShell";
 import { CheckeredFlagIcon } from "../ui/icons";
+import { audio } from "../audio/audio";
 
 export function QuizRound() {
   const roundState = useGameStore((s) => s.roundState);
@@ -42,7 +43,8 @@ export function QuizRound() {
       if (remaining <= 0) {
         clearInterval(id);
         setFeedback("bad");
-        setTimeout(() => goNext(0), 600);
+        audio.playWrong();
+        setTimeout(() => goNext(0), 700);
       }
     }, 50);
     return () => clearInterval(id);
@@ -58,7 +60,9 @@ export function QuizRound() {
     const remaining = Math.max(0, timeRemaining);
     const ok = validateAnswer(question, input);
     setFeedback(ok ? "ok" : "bad");
-    setTimeout(() => goNext(remaining), 600);
+    if (ok) audio.playCorrect();
+    else audio.playWrong();
+    setTimeout(() => goNext(remaining), ok ? 700 : 800);
   };
 
   return (
@@ -69,16 +73,10 @@ export function QuizRound() {
       credits={roundState.creditsThisRound}
       badge="Quiz"
     >
-      <p
-        style={{
-          textAlign: "center",
-          margin: "0 0 0.5rem",
-          fontFamily: "Rajdhani, sans-serif",
-          fontWeight: 600,
-        }}
-      >
-        {levelConfig.name}
-      </p>
+      <div className="quiz-track-banner">
+        <CheckeredFlagIcon size={20} />
+        <span>{levelConfig.name}</span>
+      </div>
       <div className="hw-progress">
         {questions.map((_, i) => (
           <div
@@ -87,32 +85,34 @@ export function QuizRound() {
           />
         ))}
       </div>
-      <p
-        style={{
-          textAlign: "center",
-          color: "var(--hw-muted)",
-          fontSize: "0.9rem",
-        }}
+      <div className="quiz-timer-row">
+        <span className="quiz-question-count">
+          Vraag {questionIndex + 1} / {questions.length}
+        </span>
+        <div className="hw-timer-bar" data-low={pct <= 25 ? "true" : undefined}>
+          <div className="hw-timer-fill" style={{ width: `${pct}%` }} />
+        </div>
+      </div>
+      <div
+        className={`hw-panel-question question-area ${
+          feedback ? `feedback-${feedback}` : ""
+        }`}
       >
-        Vraag {questionIndex + 1} / {questions.length}
-      </p>
-      <div className="hw-timer-bar">
-        <div className="hw-timer-fill" style={{ width: `${pct}%` }} />
-      </div>
-      <div className="hw-panel-question question-area">
         <QuestionDisplay question={question} />
+        {feedback && (
+          <div className={`hw-feedback-overlay ${feedback}`} role="status">
+            <span className="hw-feedback-badge">
+              {feedback === "ok" ? (
+                <>
+                  <CheckeredFlagIcon size={30} /> Goed!
+                </>
+              ) : (
+                "Mis!"
+              )}
+            </span>
+          </div>
+        )}
       </div>
-      {feedback && (
-        <p className={`hw-feedback ${feedback}`}>
-          {feedback === "ok" ? (
-            <>
-              <CheckeredFlagIcon size={28} /> Goed!
-            </>
-          ) : (
-            "Mis! Probeer sneller!"
-          )}
-        </p>
-      )}
       <div className="hw-answer-row">
         <input
           className="hw-answer-input"

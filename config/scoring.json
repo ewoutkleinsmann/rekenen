@@ -1,6 +1,6 @@
 {
-  "baseCorrect": 50,
-  "maxTimeBonus": 50,
+  "baseCorrect": 12,
+  "maxTimeBonus": 13,
   "questionsPerRound": 10,
   "minTimeMs": 4000,
   "maxTimeMs": 25000,

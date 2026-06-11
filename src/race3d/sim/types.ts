@@ -31,4 +31,6 @@ export interface RaceReplay {
   failureSegmentIndex?: number;
   /** Total simulated time in seconds. */
   totalTime: number;
+  /** Par time in seconds (geometry-derived). */
+  timeLimitSec?: number;
 }

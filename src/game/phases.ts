@@ -1,12 +1,13 @@
 import type { GamePhase } from "./types";
 
 const TRANSITIONS: Record<GamePhase, GamePhase[]> = {
-  title: ["quiz"],
+  title: ["intro", "quiz"],
+  intro: ["quiz"],
   quiz: ["shop"],
   shop: ["selectCar"],
   selectCar: ["race"],
   race: ["result"],
-  result: ["quiz", "title"],
+  result: ["intro", "quiz", "title"],
 };
 
 export function canTransition(from: GamePhase, to: GamePhase): boolean {

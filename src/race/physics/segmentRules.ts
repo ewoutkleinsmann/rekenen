@@ -1,13 +1,15 @@
 import type { TrackSegment } from "../../config/schemas";
 import type { EffectiveStats } from "../../garage/stats";
+import {
+  jumpFailureReason,
+  loopMinEntrySpeed,
+  loopRequiredGrip,
+} from "../../race3d/sim/segmentPhysics";
+import { shouldFlyOffCurve } from "../../race3d/sim/segmentRules";
 
 export interface SegmentCheckResult {
   ok: boolean;
   reason?: string;
-}
-
-function maxCurveSpeed(stats: EffectiveStats, radius: number): number {
-  return ((stats.handling + stats.grip) / 2) * (radius / 30);
 }
 
 export function checkSegmentEntry(
@@ -16,38 +18,31 @@ export function checkSegmentEntry(
   velocity: number,
 ): SegmentCheckResult {
   switch (segment.type) {
-    case "curve":
-      if (stats.grip < segment.minGrip) {
-        return { ok: false, reason: "Niet genoeg grip voor deze bocht!" };
-      }
-      if (velocity > maxCurveSpeed(stats, segment.radius) * 1.1) {
-        const maxV = maxCurveSpeed(stats, segment.radius);
-        if (velocity > maxV * 1.1 && stats.handling < segment.minGrip) {
-          return {
-            ok: false,
-            reason: "Te hard de bocht in! Meer grip of handling nodig.",
-          };
-        }
+    case "curve": {
+      const off = shouldFlyOffCurve(segment, stats, velocity);
+      if (off.fly) {
+        return { ok: false, reason: off.reason ?? "Uit de bocht!" };
       }
       return { ok: true };
+    }
 
-    case "loop":
-      if (stats.grip < segment.minGrip) {
+    case "loop": {
+      if (stats.grip < loopRequiredGrip(segment.radius, velocity)) {
         return { ok: false, reason: "Niet genoeg grip voor de loop!" };
       }
-      if (velocity + stats.speed * 0.15 < segment.minEntrySpeed) {
+      if (velocity + stats.speed * 0.15 < loopMinEntrySpeed(segment.radius)) {
         return { ok: false, reason: "Niet genoeg snelheid voor de loop!" };
       }
       return { ok: true };
+    }
 
-    case "jump":
-      if (velocity < segment.minSpeed) {
-        return { ok: false, reason: "Te weinig snelheid voor de sprong!" };
-      }
-      if (stats.weight > segment.maxWeight) {
-        return { ok: false, reason: "Auto te zwaar voor een veilige landing!" };
+    case "jump": {
+      const reason = jumpFailureReason(segment, stats, velocity);
+      if (reason) {
+        return { ok: false, reason };
       }
       return { ok: true };
+    }
 
     case "rocket":
       if (!stats.unlocks.includes("rocket-segment")) {
@@ -68,12 +63,9 @@ export function checkCurveOngoing(
   stats: EffectiveStats,
   velocity: number,
 ): SegmentCheckResult {
-  const maxV = maxCurveSpeed(stats, segment.radius);
-  if (velocity > maxV * 1.1 && stats.handling < segment.minGrip) {
-    return {
-      ok: false,
-      reason: "Te hard de bocht in! Meer grip of handling nodig.",
-    };
+  const off = shouldFlyOffCurve(segment, stats, velocity);
+  if (off.fly) {
+    return { ok: false, reason: off.reason };
   }
   return { ok: true };
 }

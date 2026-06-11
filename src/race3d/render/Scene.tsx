@@ -1,15 +1,26 @@
-import { useEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Sky } from "@react-three/drei";
-import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Environment, Sky } from "@react-three/drei";
 import { buildTrack3d } from "../sim/buildTrack3d";
 import type { TrackConfig } from "../../config/schemas";
 import type { RaceReplay } from "../sim/types";
-import { Track3D } from "./Track3D";
+import { Landscape } from "./Landscape";
 import { CarModel } from "./CarModel";
 import { sampleReplay, makeSampledState } from "./sampleReplay";
 import type { PlaybackRef } from "./playback";
+import {
+  introProgress,
+  raceProgress,
+  totalProgress,
+} from "./playback";
+import { RendererSetup } from "./RendererSetup";
+import {
+  CinematicDirector,
+  computeTrackOverview,
+  sampleCameraTarget,
+  targetFov,
+} from "./raceCamera";
 
 interface Props {
   track: TrackConfig;
@@ -19,120 +30,152 @@ interface Props {
   onComplete?: () => void;
 }
 
+const SUN_POSITION: [number, number, number] = [75, 85, 50];
+
 export function Scene({ track, replay, carId, playback, onComplete }: Props) {
   const built = useMemo(() => buildTrack3d(track), [track]);
   const groundY = built.bounds.min[1] - 0.5;
+  const overview = useMemo(() => computeTrackOverview(built), [built]);
+  const cx = (built.bounds.min[0] + built.bounds.max[0]) / 2;
+  const cz = (built.bounds.min[2] + built.bounds.max[2]) / 2;
 
   return (
     <>
-      <color attach="background" args={["#afd6ff"]} />
-      <fog attach="fog" args={["#bfe0ff", 120, 420]} />
+      <RendererSetup />
 
-      <Sky distance={4500} sunPosition={[60, 40, -30]} turbidity={6} rayleigh={2} />
+      <color attach="background" args={["#6a9fc8"]} />
 
-      <hemisphereLight args={["#dff1ff", "#3a4a2a", 0.9]} />
-      <ambientLight intensity={0.25} />
-      <directionalLight
-        position={[60, 90, 40]}
-        intensity={2.0}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={400}
-        shadow-camera-left={-160}
-        shadow-camera-right={160}
-        shadow-camera-top={160}
-        shadow-camera-bottom={-160}
+      <Sky
+        distance={4500}
+        sunPosition={SUN_POSITION}
+        turbidity={1.6}
+        rayleigh={0.75}
+        mieCoefficient={0.0008}
+        mieDirectionalG={0.62}
       />
 
-      <Ground y={groundY} center={built.bounds} />
+      <Environment preset="park" environmentIntensity={0.5} background={false} />
 
-      <Track3D track={built} />
+      <hemisphereLight
+        color="#b8dcff"
+        groundColor="#5a9a58"
+        intensity={0.55}
+      />
+      <ambientLight intensity={0.28} color="#d4e6f8" />
+
+      <directionalLight
+        position={[-55, 110, -45]}
+        intensity={0.7}
+        color="#e6f0ff"
+      />
+
+      <directionalLight
+        position={SUN_POSITION}
+        intensity={1.65}
+        color="#fff0d8"
+        castShadow
+        shadow-mapSize-width={4096}
+        shadow-mapSize-height={4096}
+        shadow-camera-near={2}
+        shadow-camera-far={520}
+        shadow-camera-left={-220}
+        shadow-camera-right={220}
+        shadow-camera-top={220}
+        shadow-camera-bottom={-220}
+        shadow-bias={-0.0001}
+        shadow-normalBias={0.02}
+      />
+
+      <pointLight
+        position={[cx + 70, 35, cz + 40]}
+        intensity={65}
+        color="#5ce8ff"
+        distance={280}
+        decay={2}
+      />
+      <pointLight
+        position={[cx - 60, 28, cz - 50]}
+        intensity={50}
+        color="#ff7a68"
+        distance={240}
+        decay={2}
+      />
+
+      <Suspense fallback={null}>
+        <Landscape track={built} groundY={groundY} />
+      </Suspense>
+
       <CarModel carId={carId} replay={replay} playback={playback} />
 
-      <CameraRig replay={replay} playback={playback} />
+      <CameraRig
+        replay={replay}
+        playback={playback}
+        overview={overview}
+      />
       <PlaybackController
         playback={playback}
         replay={replay}
         onComplete={onComplete}
       />
-
-      <EffectComposer>
-        <Bloom
-          intensity={0.6}
-          luminanceThreshold={0.55}
-          luminanceSmoothing={0.2}
-          mipmapBlur
-        />
-        <Vignette eskil={false} offset={0.25} darkness={0.7} />
-      </EffectComposer>
     </>
   );
 }
 
-function Ground({
-  y,
-  center,
-}: {
-  y: number;
-  center: { min: [number, number, number]; max: [number, number, number] };
-}) {
-  const cx = (center.min[0] + center.max[0]) / 2;
-  const cz = (center.min[2] + center.max[2]) / 2;
-  return (
-    <mesh
-      rotation={[-Math.PI / 2, 0, 0]}
-      position={[cx, y, cz]}
-      receiveShadow
-    >
-      <planeGeometry args={[2000, 2000]} />
-      <meshStandardMaterial color="#4f7a3a" roughness={1} metalness={0} />
-    </mesh>
-  );
-}
-
 const _state = makeSampledState();
-const _camTarget = new THREE.Vector3();
-const _lookTarget = new THREE.Vector3();
-const _offset = new THREE.Vector3();
-const _up = new THREE.Vector3(0, 1, 0);
+const _camPos = new THREE.Vector3();
+const _lookAt = new THREE.Vector3();
 
 function CameraRig({
   replay,
   playback,
+  overview,
 }: {
   replay: RaceReplay;
   playback: PlaybackRef;
+  overview: ReturnType<typeof computeTrackOverview>;
 }) {
   const { camera } = useThree();
+  const director = useMemo(() => new CinematicDirector(), []);
   const initialised = useRef(false);
+
+  useEffect(() => {
+    director.reset();
+    initialised.current = false;
+  }, [director, replay]);
 
   useFrame(() => {
     const pb = playback.current;
-    const progress =
-      pb.startTime != null
-        ? Math.min(1, (performance.now() - pb.startTime) / pb.durationMs)
-        : 0;
-    sampleReplay(replay, progress, _state);
+    const introT = introProgress(pb);
+    const raceP = raceProgress(pb);
+    sampleReplay(replay, introT < 1 ? 0 : raceP, _state);
 
-    // Behind (+local Z) and above the car.
-    _offset.set(0, 4.2, 11).applyQuaternion(_state.quat);
-    _camTarget.copy(_state.pos).add(_offset);
-    _lookTarget.copy(_state.pos).addScaledVector(_up, 1.4);
+    const mode =
+      introT < 1
+        ? "chase"
+        : director.update(raceP, performance.now());
+
+    const shotMode = introT < 1 ? "chase" : mode;
+    sampleCameraTarget(
+      shotMode,
+      _state,
+      overview,
+      introT,
+      _camPos,
+      _lookAt,
+    );
 
     if (!initialised.current) {
-      camera.position.copy(_camTarget);
+      camera.position.copy(_camPos);
       initialised.current = true;
     } else {
-      const boostPull = _state.boosting ? 0.18 : 0.12;
-      camera.position.lerp(_camTarget, boostPull);
+      const blend = introT < 1 ? 0.14 : _state.boosting ? 0.16 : 0.11;
+      camera.position.lerp(_camPos, blend);
     }
-    camera.lookAt(_lookTarget);
+    camera.lookAt(_lookAt);
 
     const cam = camera as THREE.PerspectiveCamera;
-    const targetFov = 55 + Math.min(18, _state.speed * 0.12) + (_state.boosting ? 6 : 0);
-    cam.fov += (targetFov - cam.fov) * 0.1;
+    const wantFov = targetFov(shotMode, _state.speed, _state.boosting);
+    cam.fov += (wantFov - cam.fov) * 0.08;
     cam.updateProjectionMatrix();
   });
 
@@ -159,8 +202,7 @@ function PlaybackController({
   useFrame(() => {
     const pb = playback.current;
     if (pb.startTime == null || done.current) return;
-    const progress = (performance.now() - pb.startTime) / pb.durationMs;
-    if (progress >= 1) {
+    if (totalProgress(pb) >= 1) {
       done.current = true;
       onComplete?.();
     }

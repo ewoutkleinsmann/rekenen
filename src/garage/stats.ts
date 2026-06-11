@@ -3,7 +3,10 @@ import type { CarInstance } from "../game/types";
 import type { CarStats } from "../config/schemas";
 
 export interface EffectiveStats extends CarStats {
+  carId: string;
   unlocks: string[];
+  /** Extra landing weight budget on jump segments (jump-specialist cars). */
+  jumpLandingBonus: number;
 }
 
 export function computeEffectiveStats(instance: CarInstance): EffectiveStats {
@@ -11,6 +14,7 @@ export function computeEffectiveStats(instance: CarInstance): EffectiveStats {
   const { statMin, statMax } = getCarsConfig();
   const stats: CarStats = { ...carConfig.stats };
   const unlocks: string[] = [];
+  let jumpLandingBonus = 0;
 
   for (const installed of instance.upgrades) {
     const upgrade = getUpgrade(installed.upgradeId);
@@ -44,6 +48,7 @@ export function computeEffectiveStats(instance: CarInstance): EffectiveStats {
       stats.acceleration = Math.round(
         stats.acceleration * (1 + carConfig.trait.jumpBonus),
       );
+      jumpLandingBonus = Math.round(stats.weight * carConfig.trait.jumpBonus);
     }
   }
 
@@ -51,7 +56,7 @@ export function computeEffectiveStats(instance: CarInstance): EffectiveStats {
     stats[key] = Math.min(statMax, Math.max(statMin, stats[key]));
   }
 
-  return { ...stats, unlocks };
+  return { ...stats, carId: instance.carId, unlocks, jumpLandingBonus };
 }
 
 export function getUpgradeLevel(

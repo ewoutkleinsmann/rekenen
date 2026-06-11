@@ -6,6 +6,13 @@ import {
   type Track3D as Track3DData,
 } from "../sim/buildTrack3d";
 import { cross, normalize, type Vec3 } from "../sim/vec3";
+import {
+  createAsphaltMaps,
+  createCheckeredTexture,
+  createCurbStripeTexture,
+} from "./proceduralTextures";
+import { useGrassTextures } from "./landscapeTextures";
+import { useCanvasTexture, useSurfaceMaps } from "./useSurfaceMaps";
 
 interface Props {
   track: Track3DData;
@@ -15,13 +22,12 @@ function rightOf(node: CenterlineNode): Vec3 {
   return normalize(cross(node.up, node.forward));
 }
 
-/** Build a ribbon mesh following the centerline, optionally only for nodes that
- * pass `include`. Width is given as a half-width. */
 function buildRibbon(
   nodes: CenterlineNode[],
   halfWidth: number,
   lift: number,
   include: (n: CenterlineNode) => boolean,
+  lateralOffset = 0,
 ): THREE.BufferGeometry | null {
   const positions: number[] = [];
   const normals: number[] = [];
@@ -38,15 +44,24 @@ function buildRibbon(
       continue;
     }
     const r = rightOf(n);
-    const lx = n.pos[0] + r[0] * halfWidth + n.up[0] * lift;
-    const ly = n.pos[1] + r[1] * halfWidth + n.up[1] * lift;
-    const lz = n.pos[2] + r[2] * halfWidth + n.up[2] * lift;
-    const rx = n.pos[0] - r[0] * halfWidth + n.up[0] * lift;
-    const ry = n.pos[1] - r[1] * halfWidth + n.up[1] * lift;
-    const rz = n.pos[2] - r[2] * halfWidth + n.up[2] * lift;
+    const ox = r[0] * lateralOffset;
+    const oy = r[1] * lateralOffset;
+    const oz = r[2] * lateralOffset;
+    const lx =
+      n.pos[0] + ox + r[0] * halfWidth + n.up[0] * lift;
+    const ly =
+      n.pos[1] + oy + r[1] * halfWidth + n.up[1] * lift;
+    const lz =
+      n.pos[2] + oz + r[2] * halfWidth + n.up[2] * lift;
+    const rx =
+      n.pos[0] + ox - r[0] * halfWidth + n.up[0] * lift;
+    const ry =
+      n.pos[1] + oy - r[1] * halfWidth + n.up[1] * lift;
+    const rz =
+      n.pos[2] + oz - r[2] * halfWidth + n.up[2] * lift;
     positions.push(lx, ly, lz, rx, ry, rz);
     normals.push(n.up[0], n.up[1], n.up[2], n.up[0], n.up[1], n.up[2]);
-    const v = n.dist * 0.15;
+    const v = n.dist * 0.035;
     uvs.push(0, v, 1, v);
 
     if (prevValid) {
@@ -70,20 +85,32 @@ function buildRibbon(
   return geo;
 }
 
+const _roadNormalScale = new THREE.Vector2(0.12, 0.12);
+const _vergeNormalScale = new THREE.Vector2(0.25, 0.25);
+
 export function Track3D({ track }: Props) {
-  const { roadGeo, boostGeo, centerGeo, leftCurb, rightCurb } = useMemo(() => {
-    const hw = track.roadWidth / 2;
-    return {
-      roadGeo: buildRibbon(track.nodes, hw, 0, () => true),
-      centerGeo: buildRibbon(track.nodes, hw * 0.06, 0.02, () => true),
-      boostGeo: buildRibbon(track.nodes, hw * 0.85, 0.03, (n) => {
-        const t = track.segments[n.segmentIndex]?.type;
-        return t === "booster" || t === "rocket";
-      }),
-      leftCurb: buildEdge(track.nodes, hw, 0.45),
-      rightCurb: buildEdge(track.nodes, -hw, 0.45),
-    };
-  }, [track]);
+  const vergeGrass = useGrassTextures(35);
+  const asphalt = useSurfaceMaps(createAsphaltMaps);
+  const curbMap = useCanvasTexture(createCurbStripeTexture);
+  const checkeredMap = useCanvasTexture(createCheckeredTexture);
+
+  const { grassGeo, roadGeo, boostGeo, centerGeo, leftLine, rightLine, leftCurb, rightCurb } =
+    useMemo(() => {
+      const hw = track.roadWidth / 2;
+      return {
+        grassGeo: buildRibbon(track.nodes, hw * 2.1, -0.08, () => true),
+        roadGeo: buildRibbon(track.nodes, hw, 0.02, () => true),
+        centerGeo: buildRibbon(track.nodes, hw * 0.05, 0.04, () => true),
+        boostGeo: buildRibbon(track.nodes, hw * 0.82, 0.05, (n) => {
+          const t = track.segments[n.segmentIndex]?.type;
+          return t === "booster" || t === "rocket";
+        }),
+        leftLine: buildRibbon(track.nodes, hw * 0.04, 0.035, () => true, hw * 0.88),
+        rightLine: buildRibbon(track.nodes, hw * 0.04, 0.035, () => true, -hw * 0.88),
+        leftCurb: buildEdge(track.nodes, hw + 0.35, 0.55),
+        rightCurb: buildEdge(track.nodes, -(hw + 0.35), 0.55),
+      };
+    }, [track]);
 
   const finish = useMemo(
     () => nodeAtDist(track.nodes, track.finishDist),
@@ -93,12 +120,56 @@ export function Track3D({ track }: Props) {
 
   return (
     <group>
-      {roadGeo && (
-        <mesh geometry={roadGeo} receiveShadow>
+      {grassGeo && (
+        <mesh geometry={grassGeo} receiveShadow>
           <meshStandardMaterial
-            color="#2c2f36"
-            roughness={0.85}
+            map={vergeGrass.map}
+            normalMap={vergeGrass.normalMap}
+            roughnessMap={vergeGrass.roughnessMap}
+            color="#e8f0e8"
+            roughness={0.9}
+            metalness={0}
+            envMapIntensity={0.12}
+            normalScale={_vergeNormalScale}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      )}
+      {roadGeo && (
+        <mesh geometry={roadGeo} receiveShadow castShadow>
+          <meshPhysicalMaterial
+            map={asphalt.map}
+            normalMap={asphalt.normalMap}
+            roughnessMap={asphalt.roughnessMap}
+            color="#9aa3ad"
+            roughness={0.52}
+            metalness={0.15}
+            clearcoat={0.42}
+            clearcoatRoughness={0.18}
+            envMapIntensity={0.55}
+            normalScale={_roadNormalScale}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      )}
+      {leftLine && (
+        <mesh geometry={leftLine}>
+          <meshStandardMaterial
+            color="#f5f7fa"
+            roughness={0.25}
             metalness={0.05}
+            envMapIntensity={0.5}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      )}
+      {rightLine && (
+        <mesh geometry={rightLine}>
+          <meshStandardMaterial
+            color="#f5f7fa"
+            roughness={0.25}
+            metalness={0.05}
+            envMapIntensity={0.5}
             side={THREE.DoubleSide}
           />
         </mesh>
@@ -106,9 +177,11 @@ export function Track3D({ track }: Props) {
       {centerGeo && (
         <mesh geometry={centerGeo}>
           <meshStandardMaterial
-            color="#f4d03f"
-            emissive="#3a2f00"
-            roughness={0.6}
+            color="#f0d050"
+            emissive="#6a5200"
+            emissiveIntensity={0.25}
+            roughness={0.35}
+            metalness={0.1}
             side={THREE.DoubleSide}
           />
         </mesh>
@@ -116,40 +189,48 @@ export function Track3D({ track }: Props) {
       {boostGeo && (
         <mesh geometry={boostGeo}>
           <meshStandardMaterial
-            color="#19c3ff"
-            emissive="#0aa3ff"
-            emissiveIntensity={1.6}
-            roughness={0.3}
+            color="#3cc8f0"
+            emissive="#0a98d0"
+            emissiveIntensity={0.85}
+            roughness={0.4}
+            metalness={0.05}
+            envMapIntensity={0.25}
             side={THREE.DoubleSide}
           />
         </mesh>
       )}
       {leftCurb && (
-        <mesh geometry={leftCurb}>
+        <mesh geometry={leftCurb} castShadow receiveShadow>
           <meshStandardMaterial
-            color="#ff3b30"
-            roughness={0.6}
+            map={curbMap}
+            roughness={0.5}
+            metalness={0.05}
             side={THREE.DoubleSide}
           />
         </mesh>
       )}
       {rightCurb && (
-        <mesh geometry={rightCurb}>
+        <mesh geometry={rightCurb} castShadow receiveShadow>
           <meshStandardMaterial
-            color="#ff3b30"
-            roughness={0.6}
+            map={curbMap}
+            roughness={0.5}
+            metalness={0.05}
             side={THREE.DoubleSide}
           />
         </mesh>
       )}
 
-      <Gate node={finish} width={track.roadWidth} color="#ffffff" checkered />
+      <StartPosts node={start} width={track.roadWidth} />
+      <Gate
+        node={finish}
+        width={track.roadWidth}
+        checkeredMap={checkeredMap}
+      />
       <StartLine node={start} width={track.roadWidth} />
     </group>
   );
 }
 
-/** Build a thin raised ribbon offset to one side of the road (curb). */
 function buildEdge(
   nodes: CenterlineNode[],
   offset: number,
@@ -177,7 +258,7 @@ function buildEdge(
     const iz = r[2] * Math.sign(offset) * width;
     positions.push(cx, cy, cz, cx - ix, cy - iy, cz - iz);
     normals.push(n.up[0], n.up[1], n.up[2], n.up[0], n.up[1], n.up[2]);
-    const v = n.dist * 0.3;
+    const v = n.dist * 0.2;
     uvs.push(0, v, 1, v);
     if (prevValid) {
       indices.push(prevBase, vert, prevBase + 1, prevBase + 1, vert, vert + 1);
@@ -204,45 +285,100 @@ function frameQuat(node: CenterlineNode): THREE.Quaternion {
   return new THREE.Quaternion().setFromRotationMatrix(m);
 }
 
+function StartPosts({ node, width }: { node: CenterlineNode; width: number }) {
+  const q = frameQuat(node);
+  const right = new THREE.Vector3(...node.up)
+    .clone()
+    .cross(new THREE.Vector3(...node.forward))
+    .normalize();
+  const up = new THREE.Vector3(...node.up);
+  const half = width / 2 + 0.5;
+  const base = new THREE.Vector3(...node.pos).addScaledVector(up, 0.08);
+  return (
+    <group>
+      <mesh
+        position={base.clone().addScaledVector(right, half)}
+        quaternion={q}
+        castShadow
+      >
+        <boxGeometry args={[0.35, 3.2, 0.35]} />
+        <meshStandardMaterial
+          color="#eef1f6"
+          roughness={0.3}
+          metalness={0.25}
+          envMapIntensity={0.8}
+        />
+      </mesh>
+      <mesh
+        position={base.clone().addScaledVector(right, -half)}
+        quaternion={q}
+        castShadow
+      >
+        <boxGeometry args={[0.35, 3.2, 0.35]} />
+        <meshStandardMaterial
+          color="#eef1f6"
+          roughness={0.3}
+          metalness={0.25}
+          envMapIntensity={0.8}
+        />
+      </mesh>
+    </group>
+  );
+}
+
 function Gate({
   node,
   width,
-  color,
-  checkered,
+  checkeredMap,
 }: {
   node: CenterlineNode;
   width: number;
-  color: string;
-  checkered?: boolean;
+  checkeredMap: THREE.CanvasTexture;
 }) {
   const q = frameQuat(node);
   const right = new THREE.Vector3(...node.up)
     .clone()
     .cross(new THREE.Vector3(...node.forward))
     .normalize();
+  const up = new THREE.Vector3(...node.up);
   const half = width / 2 + 0.6;
-  const base = new THREE.Vector3(...node.pos);
-  const leftPost = base.clone().addScaledVector(right, half);
-  const rightPost = base.clone().addScaledVector(right, -half);
+  const base = new THREE.Vector3(...node.pos).addScaledVector(up, 0.1);
+  const bannerPos = base.clone().addScaledVector(up, 4.8);
   return (
     <group>
-      <mesh position={leftPost} quaternion={q} castShadow>
+      <mesh
+        position={base.clone().addScaledVector(right, half)}
+        quaternion={q}
+        castShadow
+      >
         <boxGeometry args={[0.4, 5, 0.4]} />
-        <meshStandardMaterial color="#e8eaed" />
-      </mesh>
-      <mesh position={rightPost} quaternion={q} castShadow>
-        <boxGeometry args={[0.4, 5, 0.4]} />
-        <meshStandardMaterial color="#e8eaed" />
+        <meshStandardMaterial
+          color="#f2f4f8"
+          roughness={0.3}
+          metalness={0.25}
+          envMapIntensity={0.75}
+        />
       </mesh>
       <mesh
-        position={base.clone().addScaledVector(new THREE.Vector3(0, 1, 0), 5)}
+        position={base.clone().addScaledVector(right, -half)}
         quaternion={q}
+        castShadow
       >
-        <boxGeometry args={[width + 1.6, 1.2, 0.3]} />
+        <boxGeometry args={[0.4, 5, 0.4]} />
         <meshStandardMaterial
-          color={checkered ? "#111111" : color}
-          emissive={checkered ? "#000000" : color}
-          emissiveIntensity={0.2}
+          color="#f2f4f8"
+          roughness={0.3}
+          metalness={0.25}
+          envMapIntensity={0.75}
+        />
+      </mesh>
+      <mesh position={bannerPos} quaternion={q} castShadow>
+        <boxGeometry args={[width + 1.6, 1.1, 0.25]} />
+        <meshStandardMaterial
+          map={checkeredMap}
+          roughness={0.45}
+          metalness={0.08}
+          envMapIntensity={0.4}
         />
       </mesh>
     </group>
@@ -261,7 +397,7 @@ function StartLine({ node, width }: { node: CenterlineNode; width: number }) {
       quaternion={q}
     >
       <boxGeometry args={[width, 0.05, 1.2]} />
-      <meshStandardMaterial color="#f5f5f5" />
+      <meshStandardMaterial color="#f8f8f8" roughness={0.4} />
     </mesh>
   );
 }

@@ -6,7 +6,7 @@ import { calculatePoints } from "../quiz/scoring";
 import { validateAnswer } from "../questions/registry";
 import { buyCar, applyUpgrade } from "../garage/shop";
 import { computeEffectiveStats } from "../garage/stats";
-import { getLevel, getTrack } from "../config/loadConfig";
+import { getLevel, getTrack, getMaxLevelId } from "../config/loadConfig";
 import type { RaceReplay } from "../race3d/sim/types";
 import type { Question } from "../questions/types";
 
@@ -16,7 +16,8 @@ interface GameStore extends GameSave {
   init: () => void;
   newGame: (name?: string) => void;
   setPhase: (phase: GamePhase) => void;
-  startQuiz: () => void;
+  startLevel: () => void;
+  beginQuiz: () => void;
   submitAnswer: (input: string, timeRemainingMs: number) => void;
   finishShop: () => void;
   buyCarAction: (carId: string) => boolean;
@@ -46,10 +47,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   init() {
     const saved = loadSave();
     if (saved) {
-      const questions =
-        saved.roundState && saved.phase === "quiz"
-          ? generateRoundQuestions(saved.level, saved.roundState.seed)
-          : [];
+      const needsQuestions =
+        saved.roundState &&
+        (saved.phase === "quiz" || saved.phase === "intro");
+      const questions = needsQuestions
+        ? generateRoundQuestions(saved.level, saved.roundState!.seed)
+        : [];
       set({ ...saved, questions, raceReplay: null });
     }
   },
@@ -66,16 +69,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().persist();
   },
 
-  startQuiz() {
+  startLevel() {
     const { level } = get();
     const seed = Math.floor(Math.random() * 1_000_000);
     const questions = generateRoundQuestions(level, seed);
     set({
-      phase: "quiz",
+      phase: "intro",
       roundState: newRoundState(seed),
       questions,
       lastRaceResult: undefined,
     });
+    get().persist();
+  },
+
+  beginQuiz() {
+    set({ phase: "quiz" });
     get().persist();
   },
 
@@ -137,7 +145,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   buyCarAction(carId) {
     const state = get();
-    const result = buyCar(carId, state.ownedCars, state.credits);
+    const result = buyCar(carId, state.ownedCars, state.credits, state.level);
     if (!result) return false;
     set({ ownedCars: result.cars, credits: result.credits });
     get().persist();
@@ -202,28 +210,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
   continueAfterResult() {
     const state = get();
     const won = state.lastRaceResult?.success ?? false;
-    if (won && state.level < 9) {
-      set({
-        level: state.level + 1,
-        phase: "quiz",
-        roundState: undefined,
-        questions: [],
-        raceReplay: null,
-        lastRaceResult: undefined,
-        selectedCarInstanceId: undefined,
-      });
-      get().startQuiz();
-    } else {
-      set({
-        phase: "quiz",
-        roundState: undefined,
-        questions: [],
-        raceReplay: null,
-        lastRaceResult: undefined,
-        selectedCarInstanceId: undefined,
-      });
-      get().startQuiz();
-    }
+    set({
+      level:
+        won && state.level < getMaxLevelId()
+          ? state.level + 1
+          : state.level,
+      roundState: undefined,
+      questions: [],
+      raceReplay: null,
+      lastRaceResult: undefined,
+      selectedCarInstanceId: undefined,
+    });
+    get().startLevel();
   },
 
   persist() {
@@ -233,7 +231,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       init,
       newGame,
       setPhase,
-      startQuiz,
+      startLevel,
+      beginQuiz,
       submitAnswer,
       finishShop,
       buyCarAction,
@@ -250,7 +249,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void init;
     void newGame;
     void setPhase;
-    void startQuiz;
+    void startLevel;
+    void beginQuiz;
     void submitAnswer;
     void finishShop;
     void buyCarAction;

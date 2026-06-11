@@ -5,6 +5,7 @@ import {
   getTrack,
   getTracksConfig,
 } from "../config/loadConfig";
+import type { CarStats } from "../config/schemas";
 import { computeEffectiveStats } from "../garage/stats";
 import type { CarInstance } from "../game/types";
 import { simulateRace3D } from "../race3d/sim/simulateRace3d";
@@ -18,11 +19,15 @@ const Race3D = lazy(() =>
 
 export function RaceDevScreen() {
   const tracks = getTracksConfig().tracks;
-  const cars = getCarsConfig().cars;
+  const carsConfig = getCarsConfig();
+  const cars = carsConfig.cars;
+  const { statMin, statMax } = carsConfig;
 
   const [trackId, setTrackId] = useState(tracks[0]?.id ?? "track-01");
   const [carId, setCarId] = useState(cars[0]?.id ?? "booster-blaze");
   const [rocketUnlock, setRocketUnlock] = useState(false);
+  const [tuneStats, setTuneStats] = useState(false);
+  const [devStats, setDevStats] = useState<CarStats | null>(null);
   const [replay, setReplay] = useState<RaceReplay | null>(null);
   /** Track/car combo the current `replay` was simulated for (guards stale async + UI mismatch). */
   const [replayKey, setReplayKey] = useState<string | null>(null);
@@ -32,13 +37,38 @@ export function RaceDevScreen() {
   const track = getTrack(trackId);
   const car = getCar(carId);
 
-  const selectionKey = `${trackId}:${carId}:${rocketUnlock ? "rocket" : "no-rocket"}`;
+  const statKey =
+    tuneStats && devStats
+      ? [
+          devStats.speed,
+          devStats.acceleration,
+          devStats.handling,
+          devStats.grip,
+          devStats.boost,
+          devStats.weight,
+        ].join(",")
+      : "car";
+
+  const selectionKey = `${trackId}:${carId}:${rocketUnlock ? "rocket" : "no-rocket"}:${statKey}`;
 
   useEffect(() => {
     setReplay(null);
     setReplayKey(null);
     setRunning(false);
   }, [selectionKey]);
+
+  useEffect(() => {
+    const instance: CarInstance = {
+      instanceId: "dev",
+      carId,
+      upgrades: rocketUnlock
+        ? [{ upgradeId: "baan-blaster-rockets", level: 1 }]
+        : [],
+    };
+    const base = computeEffectiveStats(instance);
+    const { unlocks: _u, ...numeric } = base;
+    setDevStats(numeric);
+  }, [carId, rocketUnlock]);
 
   const run = useCallback(async () => {
     const runKey = selectionKey;
@@ -51,9 +81,13 @@ export function RaceDevScreen() {
         : [],
     };
     const stats = computeEffectiveStats(instance);
+    const statOverrides =
+      tuneStats && devStats ? devStats : undefined;
     setRunning(true);
     try {
-      const result = await simulateRace3D(stats, runTrack);
+      const result = await simulateRace3D(stats, runTrack, {
+        statOverrides,
+      });
       if (runKey !== selectionKey) return;
       setReplay(result);
       setReplayKey(runKey);
@@ -61,7 +95,16 @@ export function RaceDevScreen() {
     } finally {
       if (runKey === selectionKey) setRunning(false);
     }
-  }, [carId, rocketUnlock, trackId, selectionKey]);
+  }, [carId, devStats, rocketUnlock, trackId, selectionKey, tuneStats]);
+
+  const statLabels: { key: keyof CarStats; label: string }[] = [
+    { key: "speed", label: "Snelheid" },
+    { key: "acceleration", label: "Acceleratie" },
+    { key: "handling", label: "Handling" },
+    { key: "grip", label: "Grip" },
+    { key: "boost", label: "Boost" },
+    { key: "weight", label: "Gewicht" },
+  ];
 
   return (
     <ScreenShell variant="race" className="race-dev-screen" badge="Race Dev">
@@ -111,6 +154,41 @@ export function RaceDevScreen() {
           />
           Rocket unlock (Baan Blaster)
         </label>
+
+        <label className="race-dev-check">
+          <input
+            type="checkbox"
+            checked={tuneStats}
+            onChange={(e) => setTuneStats(e.target.checked)}
+          />
+          Stats handmatig (normaal uit auto + upgrades)
+        </label>
+
+        {tuneStats && devStats && (
+          <div className="race-dev-stats">
+            {statLabels.map(({ key, label }) => (
+              <label key={key} className="race-dev-stat">
+                <span>
+                  {label}{" "}
+                  <output className="race-dev-stat-val">{devStats[key]}</output>
+                </span>
+                <input
+                  type="range"
+                  min={statMin}
+                  max={statMax}
+                  value={devStats[key]}
+                  onChange={(e) =>
+                    setDevStats((s) =>
+                      s
+                        ? { ...s, [key]: Number(e.target.value) }
+                        : s,
+                    )
+                  }
+                />
+              </label>
+            ))}
+          </div>
+        )}
 
         <button
           type="button"

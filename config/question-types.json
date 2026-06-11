@@ -50,10 +50,6 @@
       "display": "money"
     },
     "money_story": { "label": "Verhaaltjessom geld", "timeFactor": 1.35 },
-    "add_sub_1000": {
-      "label": "Optellen/aftrekken tot 1000",
-      "timeFactor": 0.9
-    },
     "skip_count_7": { "label": "Sprongen van 7", "timeFactor": 0.7 },
     "skip_count_9": { "label": "Sprongen van 9", "timeFactor": 0.7 },
     "skip_count_100": { "label": "Sprongen van 100", "timeFactor": 0.65 },

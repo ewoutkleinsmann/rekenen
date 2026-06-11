@@ -3,40 +3,40 @@
     {
       "id": "power-booster-kit",
       "name": "Power Booster Kit",
-      "description": "Meer boostkracht in booster-zones.",
-      "price": 40,
-      "maxLevel": 3,
-      "effectsPerLevel": { "boost": 8 }
+      "description": "Meer boostkracht in booster-zones (hogere topsnelheid op pads).",
+      "price": 70,
+      "maxLevel": 4,
+      "effectsPerLevel": { "boost": 7 }
     },
     {
       "id": "slicks",
       "name": "Slicks",
-      "description": "Extra grip voor bochten en loops.",
-      "price": 35,
-      "maxLevel": 3,
-      "effectsPerLevel": { "grip": 7 }
+      "description": "Extra grip voor bochten en loops (level 4–5 voor extreme high-speed hairpins).",
+      "price": 65,
+      "maxLevel": 5,
+      "effectsPerLevel": { "grip": 6 }
     },
     {
       "id": "sport-steering",
       "name": "Sport Steering",
       "description": "Betere controle in bochten.",
-      "price": 35,
-      "maxLevel": 3,
-      "effectsPerLevel": { "handling": 7 }
+      "price": 65,
+      "maxLevel": 5,
+      "effectsPerLevel": { "handling": 6 }
     },
     {
       "id": "lightweight-chassis",
       "name": "Lightweight Chassis",
       "description": "Lichtere auto, betere sprongen.",
-      "price": 45,
-      "maxLevel": 2,
-      "effectsPerLevel": { "weight": -6 }
+      "price": 90,
+      "maxLevel": 3,
+      "effectsPerLevel": { "weight": -5 }
     },
     {
       "id": "baan-blaster-rockets",
       "name": "Baan Blaster Rockets",
       "description": "Raketten voor extra sprongboost!",
-      "price": 60,
+      "price": 120,
       "maxLevel": 1,
       "effectsPerLevel": { "boost": 5 },
       "unlocks": ["rocket-segment"]
@@ -45,9 +45,9 @@
       "id": "super-charger-motor",
       "name": "Super-Charger Motor",
       "description": "Meer snelheid en acceleratie.",
-      "price": 50,
-      "maxLevel": 3,
-      "effectsPerLevel": { "speed": 6, "acceleration": 5 }
+      "price": 90,
+      "maxLevel": 5,
+      "effectsPerLevel": { "speed": 5, "acceleration": 4 }
     }
   ]
 }

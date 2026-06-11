@@ -7,6 +7,7 @@ import { ScreenShell } from "../ui/ScreenShell";
 import { WheelCreditIcon, CarSvg } from "../ui/icons";
 
 export function ShopScreen() {
+  const level = useGameStore((s) => s.level);
   const credits = useGameStore((s) => s.credits);
   const ownedCars = useGameStore((s) => s.ownedCars);
   const roundState = useGameStore((s) => s.roundState);
@@ -19,7 +20,7 @@ export function ShopScreen() {
   );
 
   const earned = roundState?.creditsThisRound ?? 0;
-  const purchasableCars = getPurchasableCars(ownedCars);
+  const purchasableCars = getPurchasableCars(ownedCars, level);
   const upgrades = getAvailableUpgrades();
   const carInstance = ownedCars.find((c) => c.instanceId === selectedCar);
 

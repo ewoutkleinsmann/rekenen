@@ -4,107 +4,999 @@
       "id": "track-01",
       "name": "Orange Loop Starter",
       "segments": [
-        { "type": "straight", "length": 80 },
-        { "type": "curve", "radius": 50, "angle": 60, "minGrip": 25 },
-        { "type": "straight", "length": 60 },
-        { "type": "booster", "boostMultiplier": 1.3 }
+        {
+          "type": "straight",
+          "length": 90
+        },
+        {
+          "type": "curve",
+          "radius": 58,
+          "angle": 40
+        },
+        {
+          "type": "straight",
+          "length": 70
+        },
+        {
+          "type": "curve",
+          "radius": 52,
+          "angle": 50
+        },
+        {
+          "type": "straight",
+          "length": 60
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.2
+        }
       ],
-      "finishCondition": "complete_all_segments"
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 26.1,
+      "recommendedCarId": "booster-blaze",
+      "recommendedCarTip": "Slicks helpen al in de eerste bochten."
     },
     {
       "id": "track-02",
       "name": "Blue Curve Challenge",
       "segments": [
-        { "type": "straight", "length": 70 },
-        { "type": "curve", "radius": 40, "angle": 90, "minGrip": 35 },
-        { "type": "straight", "length": 50 },
-        { "type": "curve", "radius": 45, "angle": 75, "minGrip": 30 },
-        { "type": "booster", "boostMultiplier": 1.4 }
+        {
+          "type": "straight",
+          "length": 75
+        },
+        {
+          "type": "curve",
+          "radius": 48,
+          "angle": 65
+        },
+        {
+          "type": "straight",
+          "length": 55
+        },
+        {
+          "type": "curve",
+          "radius": 44,
+          "angle": 70
+        },
+        {
+          "type": "straight",
+          "length": 50
+        },
+        {
+          "type": "curve",
+          "radius": 50,
+          "angle": 55
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.25
+        }
       ],
-      "finishCondition": "complete_all_segments"
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 26.4,
+      "recommendedCarId": "booster-blaze",
+      "recommendedCarTip": "Meer grip-upgrades voor de scherpe bochten."
     },
     {
       "id": "track-03",
       "name": "Turbo Straight",
       "segments": [
-        { "type": "straight", "length": 100 },
-        { "type": "booster", "boostMultiplier": 1.5 },
-        { "type": "straight", "length": 80 },
-        { "type": "curve", "radius": 35, "angle": 90, "minGrip": 40 }
+        {
+          "type": "straight",
+          "length": 78
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.33
+        },
+        {
+          "type": "straight",
+          "length": 17
+        },
+        {
+          "type": "curve",
+          "radius": 34,
+          "angle": 89
+        },
+        {
+          "type": "straight",
+          "length": 52
+        },
+        {
+          "type": "curve",
+          "radius": 39,
+          "angle": 80
+        },
+        {
+          "type": "straight",
+          "length": 48
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.24
+        }
       ],
-      "finishCondition": "complete_all_segments"
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 16.4,
+      "recommendedCarId": "booster-blaze",
+      "recommendedCarTip": "Power Booster Kit is key na de turbo-recht."
     },
     {
       "id": "track-04",
       "name": "Measure Mountain",
       "segments": [
-        { "type": "straight", "length": 60 },
-        { "type": "curve", "radius": 38, "angle": 90, "minGrip": 42 },
-        { "type": "jump", "length": 40, "minSpeed": 55, "maxWeight": 65 },
-        { "type": "straight", "length": 50 },
-        { "type": "booster", "boostMultiplier": 1.5 }
+        {
+          "type": "straight",
+          "length": 55
+        },
+        {
+          "type": "curve",
+          "radius": 32,
+          "angle": 88
+        },
+        {
+          "type": "straight",
+          "length": 50
+        },
+        {
+          "type": "curve",
+          "radius": 28,
+          "angle": 98
+        },
+        {
+          "type": "straight",
+          "length": 30
+        },
+        {
+          "type": "jump",
+          "length": 94
+        },
+        {
+          "type": "straight",
+          "length": 50
+        },
+        {
+          "type": "curve",
+          "radius": 42,
+          "angle": 68
+        },
+        {
+          "type": "straight",
+          "length": 45
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.35
+        }
       ],
-      "finishCondition": "complete_all_segments"
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 28.4,
+      "recommendedCarId": "jump-jet",
+      "recommendedCarTip": "Licht gewicht voor Measure Mountain."
     },
     {
       "id": "track-05",
       "name": "Loop de Loop",
       "segments": [
-        { "type": "straight", "length": 80 },
-        { "type": "booster", "boostMultiplier": 1.6 },
-        { "type": "loop", "radius": 25, "minEntrySpeed": 70, "minGrip": 50 },
-        { "type": "straight", "length": 60 }
+        {
+          "type": "straight",
+          "length": 85
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.4
+        },
+        {
+          "type": "straight",
+          "length": 40
+        },
+        {
+          "type": "loop",
+          "radius": 23
+        },
+        {
+          "type": "straight",
+          "length": 70
+        },
+        {
+          "type": "curve",
+          "radius": 45,
+          "angle": 55
+        },
+        {
+          "type": "straight",
+          "length": 55
+        }
       ],
-      "finishCondition": "complete_all_segments"
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 23.9,
+      "recommendedCarId": "loop-king",
+      "recommendedCarTip": "Loops vragen loop-snelheid én grip."
     },
     {
       "id": "track-06",
       "name": "Double Booster Dash",
       "segments": [
-        { "type": "straight", "length": 50 },
-        { "type": "booster", "boostMultiplier": 1.5 },
-        { "type": "curve", "radius": 42, "angle": 80, "minGrip": 45 },
-        { "type": "booster", "boostMultiplier": 1.4 },
-        { "type": "jump", "length": 35, "minSpeed": 60, "maxWeight": 60 }
+        {
+          "type": "straight",
+          "length": 60
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.28
+        },
+        {
+          "type": "straight",
+          "length": 38
+        },
+        {
+          "type": "curve",
+          "radius": 40,
+          "angle": 74
+        },
+        {
+          "type": "straight",
+          "length": 26
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.26
+        },
+        {
+          "type": "jump",
+          "length": 58
+        },
+        {
+          "type": "straight",
+          "length": 148
+        },
+        {
+          "type": "curve",
+          "radius": 36,
+          "angle": 82
+        }
       ],
-      "finishCondition": "complete_all_segments"
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 21.8,
+      "recommendedCarId": "jump-jet",
+      "recommendedCarTip": "Sprong na de dubbele booster."
     },
     {
       "id": "track-07",
       "name": "Grip Gauntlet Pro",
       "segments": [
-        { "type": "straight", "length": 60 },
-        { "type": "curve", "radius": 32, "angle": 100, "minGrip": 55 },
-        { "type": "loop", "radius": 22, "minEntrySpeed": 78, "minGrip": 58 },
-        { "type": "curve", "radius": 35, "angle": 90, "minGrip": 50 }
+        {
+          "type": "straight",
+          "length": 50
+        },
+        {
+          "type": "curve",
+          "radius": 29,
+          "angle": 98
+        },
+        {
+          "type": "straight",
+          "length": 28
+        },
+        {
+          "type": "curve",
+          "radius": 31,
+          "angle": 96
+        },
+        {
+          "type": "straight",
+          "length": 32
+        },
+        {
+          "type": "loop",
+          "radius": 21
+        },
+        {
+          "type": "straight",
+          "length": 48
+        },
+        {
+          "type": "curve",
+          "radius": 30,
+          "angle": 98
+        }
       ],
-      "finishCondition": "complete_all_segments"
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 18,
+      "recommendedCarId": "grip-gt",
+      "recommendedCarTip": "Extreme bochten en een strakke loop."
     },
     {
       "id": "track-08",
       "name": "Rocket Ramp",
       "segments": [
-        { "type": "straight", "length": 70 },
-        { "type": "booster", "boostMultiplier": 1.6 },
-        { "type": "jump", "length": 50, "minSpeed": 65, "maxWeight": 55 },
-        { "type": "rocket", "boostMultiplier": 1.8 },
-        { "type": "straight", "length": 60 }
+        {
+          "type": "straight",
+          "length": 75
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.45
+        },
+        {
+          "type": "straight",
+          "length": 40
+        },
+        {
+          "type": "jump",
+          "length": 44
+        },
+        {
+          "type": "straight",
+          "length": 35
+        },
+        {
+          "type": "rocket",
+          "boostMultiplier": 1.65
+        },
+        {
+          "type": "straight",
+          "length": 60
+        },
+        {
+          "type": "curve",
+          "radius": 42,
+          "angle": 60
+        }
       ],
-      "finishCondition": "complete_all_segments"
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 15.4,
+      "recommendedCarId": "rocket-racer",
+      "recommendedCarTip": "Raketstuk — Baan Blaster op Booster Blaze kan ook, maar dit is de raket-specialist."
     },
     {
       "id": "track-09",
       "name": "Champion's Crown",
       "segments": [
-        { "type": "straight", "length": 50 },
-        { "type": "booster", "boostMultiplier": 1.7 },
-        { "type": "curve", "radius": 30, "angle": 110, "minGrip": 60 },
-        { "type": "loop", "radius": 20, "minEntrySpeed": 82, "minGrip": 62 },
-        { "type": "jump", "length": 45, "minSpeed": 70, "maxWeight": 50 },
-        { "type": "rocket", "boostMultiplier": 2.0 },
-        { "type": "straight", "length": 40 }
+        {
+          "type": "straight",
+          "length": 55
+        },
+        {
+          "type": "curve",
+          "radius": 38,
+          "angle": 82
+        },
+        {
+          "type": "straight",
+          "length": 40
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.5
+        },
+        {
+          "type": "loop",
+          "radius": 26
+        },
+        {
+          "type": "straight",
+          "length": 35
+        },
+        {
+          "type": "jump",
+          "length": 55
+        },
+        {
+          "type": "rocket",
+          "boostMultiplier": 1.75
+        },
+        {
+          "type": "straight",
+          "length": 35
+        },
+        {
+          "type": "curve",
+          "radius": 27,
+          "angle": 102
+        }
       ],
-      "finishCondition": "complete_all_segments"
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 17.8,
+      "recommendedCarId": "rocket-racer",
+      "recommendedCarTip": "Mix van alles; raket + upgrades."
+    },
+    {
+      "id": "track-10",
+      "name": "Autobahn Alley",
+      "segments": [
+        {
+          "type": "straight",
+          "length": 140
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.2
+        },
+        {
+          "type": "straight",
+          "length": 120
+        },
+        {
+          "type": "curve",
+          "radius": 58,
+          "angle": 36
+        },
+        {
+          "type": "straight",
+          "length": 100
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.22
+        },
+        {
+          "type": "straight",
+          "length": 90
+        },
+        {
+          "type": "curve",
+          "radius": 54,
+          "angle": 40
+        },
+        {
+          "type": "straight",
+          "length": 70
+        }
+      ],
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 12.05,
+      "recommendedCarId": "booster-blaze",
+      "recommendedCarTip": "Pure snelheid op lange rechte stukken."
+    },
+    {
+      "id": "track-11",
+      "name": "Velocity Viaduct",
+      "segments": [
+        {
+          "type": "straight",
+          "length": 85
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.28
+        },
+        {
+          "type": "straight",
+          "length": 75
+        },
+        {
+          "type": "curve",
+          "radius": 46,
+          "angle": 58
+        },
+        {
+          "type": "straight",
+          "length": 55
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.26
+        },
+        {
+          "type": "straight",
+          "length": 65
+        },
+        {
+          "type": "curve",
+          "radius": 42,
+          "angle": 62
+        },
+        {
+          "type": "straight",
+          "length": 80
+        },
+        {
+          "type": "curve",
+          "radius": 48,
+          "angle": 50
+        }
+      ],
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 13.2,
+      "recommendedCarId": "booster-blaze",
+      "recommendedCarTip": "Booster-ketens en hoge topsnelheid."
+    },
+    {
+      "id": "track-12",
+      "name": "Chicane Charge",
+      "segments": [
+        {
+          "type": "straight",
+          "length": 70
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.32
+        },
+        {
+          "type": "straight",
+          "length": 22
+        },
+        {
+          "type": "curve",
+          "radius": 25,
+          "angle": 98
+        },
+        {
+          "type": "straight",
+          "length": 14
+        },
+        {
+          "type": "curve",
+          "radius": 23,
+          "angle": 102
+        },
+        {
+          "type": "straight",
+          "length": 55
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.24
+        },
+        {
+          "type": "straight",
+          "length": 18
+        },
+        {
+          "type": "curve",
+          "radius": 26,
+          "angle": 94
+        },
+        {
+          "type": "straight",
+          "length": 60
+        }
+      ],
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 20.55,
+      "recommendedCarId": "grip-gt",
+      "recommendedCarTip": "Chicane met haakse bochten."
+    },
+    {
+      "id": "track-13",
+      "name": "Marathon Mix",
+      "segments": [
+        {
+          "type": "straight",
+          "length": 75
+        },
+        {
+          "type": "curve",
+          "radius": 44,
+          "angle": 55
+        },
+        {
+          "type": "straight",
+          "length": 58
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.22
+        },
+        {
+          "type": "straight",
+          "length": 62
+        },
+        {
+          "type": "jump",
+          "length": 54
+        },
+        {
+          "type": "straight",
+          "length": 70
+        },
+        {
+          "type": "curve",
+          "radius": 36,
+          "angle": 80
+        },
+        {
+          "type": "straight",
+          "length": 55
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.18
+        },
+        {
+          "type": "straight",
+          "length": 65
+        },
+        {
+          "type": "curve",
+          "radius": 34,
+          "angle": 84
+        },
+        {
+          "type": "straight",
+          "length": 48
+        },
+        {
+          "type": "curve",
+          "radius": 40,
+          "angle": 62
+        }
+      ],
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 22.8,
+      "recommendedCarId": "jump-jet",
+      "recommendedCarTip": "Marathon met meerdere sprongen."
+    },
+    {
+      "id": "track-14",
+      "name": "Twin Loop Titan",
+      "segments": [
+        {
+          "type": "straight",
+          "length": 90
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.35
+        },
+        {
+          "type": "straight",
+          "length": 45
+        },
+        {
+          "type": "loop",
+          "radius": 22
+        },
+        {
+          "type": "straight",
+          "length": 55
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.3
+        },
+        {
+          "type": "straight",
+          "length": 40
+        },
+        {
+          "type": "loop",
+          "radius": 21
+        },
+        {
+          "type": "straight",
+          "length": 65
+        },
+        {
+          "type": "curve",
+          "radius": 40,
+          "angle": 62
+        }
+      ],
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 26.8,
+      "recommendedCarId": "loop-king",
+      "recommendedCarTip": "Twee loops achter elkaar."
+    },
+    {
+      "id": "track-15",
+      "name": "Hairpin Express",
+      "segments": [
+        {
+          "type": "straight",
+          "length": 100
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.38
+        },
+        {
+          "type": "straight",
+          "length": 35
+        },
+        {
+          "type": "curve",
+          "radius": 25,
+          "angle": 100
+        },
+        {
+          "type": "straight",
+          "length": 25
+        },
+        {
+          "type": "curve",
+          "radius": 24,
+          "angle": 102
+        },
+        {
+          "type": "straight",
+          "length": 70
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.32
+        },
+        {
+          "type": "straight",
+          "length": 28
+        },
+        {
+          "type": "curve",
+          "radius": 26,
+          "angle": 98
+        },
+        {
+          "type": "straight",
+          "length": 55
+        }
+      ],
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 24.2,
+      "recommendedCarId": "grip-gt",
+      "recommendedCarTip": "Haarpin-bochten zonder af te remmen."
+    },
+    {
+      "id": "track-16",
+      "name": "Skybridge Saga",
+      "segments": [
+        {
+          "type": "straight",
+          "length": 65
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.25
+        },
+        {
+          "type": "straight",
+          "length": 40
+        },
+        {
+          "type": "jump",
+          "length": 92
+        },
+        {
+          "type": "straight",
+          "length": 38
+        },
+        {
+          "type": "jump",
+          "length": 88
+        },
+        {
+          "type": "straight",
+          "length": 40
+        },
+        {
+          "type": "curve",
+          "radius": 44,
+          "angle": 58
+        },
+        {
+          "type": "straight",
+          "length": 50
+        },
+        {
+          "type": "jump",
+          "length": 108
+        },
+        {
+          "type": "straight",
+          "length": 70
+        },
+        {
+          "type": "curve",
+          "radius": 38,
+          "angle": 70
+        }
+      ],
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 28.5,
+      "recommendedCarId": "jump-jet",
+      "recommendedCarTip": "Drie grote sprongen achter elkaar."
+    },
+    {
+      "id": "track-17",
+      "name": "Rocket Runway",
+      "segments": [
+        {
+          "type": "straight",
+          "length": 95
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.42
+        },
+        {
+          "type": "straight",
+          "length": 55
+        },
+        {
+          "type": "rocket",
+          "boostMultiplier": 1.7
+        },
+        {
+          "type": "straight",
+          "length": 110
+        },
+        {
+          "type": "curve",
+          "radius": 46,
+          "angle": 52
+        },
+        {
+          "type": "straight",
+          "length": 80
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.28
+        }
+      ],
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 23.5,
+      "recommendedCarId": "rocket-racer",
+      "recommendedCarTip": "Lange raketstraat — raket-auto of volle boost-build."
+    },
+    {
+      "id": "track-18",
+      "name": "Grande Gauntlet",
+      "segments": [
+        {
+          "type": "straight",
+          "length": 70
+        },
+        {
+          "type": "curve",
+          "radius": 34,
+          "angle": 86
+        },
+        {
+          "type": "straight",
+          "length": 45
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.3
+        },
+        {
+          "type": "loop",
+          "radius": 22
+        },
+        {
+          "type": "straight",
+          "length": 50
+        },
+        {
+          "type": "jump",
+          "length": 62
+        },
+        {
+          "type": "straight",
+          "length": 40
+        },
+        {
+          "type": "rocket",
+          "boostMultiplier": 1.65
+        },
+        {
+          "type": "straight",
+          "length": 55
+        },
+        {
+          "type": "curve",
+          "radius": 29,
+          "angle": 94
+        },
+        {
+          "type": "straight",
+          "length": 35
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.26
+        },
+        {
+          "type": "straight",
+          "length": 60
+        },
+        {
+          "type": "curve",
+          "radius": 32,
+          "angle": 88
+        },
+        {
+          "type": "straight",
+          "length": 45
+        }
+      ],
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 26.5,
+      "recommendedCarId": "grip-gt",
+      "recommendedCarTip": "Mix van grip, loop en sprong — grip-auto houdt de lijn."
+    },
+    {
+      "id": "track-19",
+      "name": "Ultimate Crown",
+      "segments": [
+        {
+          "type": "straight",
+          "length": 75
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.45
+        },
+        {
+          "type": "straight",
+          "length": 40
+        },
+        {
+          "type": "curve",
+          "radius": 28,
+          "angle": 96
+        },
+        {
+          "type": "straight",
+          "length": 30
+        },
+        {
+          "type": "loop",
+          "radius": 22
+        },
+        {
+          "type": "straight",
+          "length": 35
+        },
+        {
+          "type": "jump",
+          "length": 68
+        },
+        {
+          "type": "straight",
+          "length": 42
+        },
+        {
+          "type": "rocket",
+          "boostMultiplier": 1.78
+        },
+        {
+          "type": "straight",
+          "length": 48
+        },
+        {
+          "type": "curve",
+          "radius": 26,
+          "angle": 100
+        },
+        {
+          "type": "straight",
+          "length": 22
+        },
+        {
+          "type": "booster",
+          "boostMultiplier": 1.34
+        },
+        {
+          "type": "straight",
+          "length": 26
+        },
+        {
+          "type": "curve",
+          "radius": 25,
+          "angle": 102
+        },
+        {
+          "type": "straight",
+          "length": 40
+        }
+      ],
+      "finishCondition": "complete_all_segments",
+      "timeLimitSec": 30.5,
+      "recommendedCarId": "rocket-racer",
+      "recommendedCarTip": "Finale: alles op één baan, investeer in de raket-specialist."
     }
   ]
 }

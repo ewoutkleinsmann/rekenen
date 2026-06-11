@@ -1,5 +1,5 @@
 import { useGameStore } from "../game/store";
-import { getLevel } from "../config/loadConfig";
+import { getLevel, getMaxLevelId, getCar, getTrack } from "../config/loadConfig";
 import { ScreenShell } from "../ui/ScreenShell";
 import { TrophyIcon, CheckeredFlagIcon } from "../ui/icons";
 
@@ -9,7 +9,12 @@ export function ResultScreen() {
   const continueAfterResult = useGameStore((s) => s.continueAfterResult);
   const levelConfig = getLevel(level);
 
+  const maxLevel = getMaxLevelId();
+
   const won = lastRaceResult?.success ?? false;
+  const track = getTrack(levelConfig.trackId);
+  const recommended =
+    track.recommendedCarId != null ? getCar(track.recommendedCarId) : null;
 
   return (
     <ScreenShell
@@ -32,7 +37,7 @@ export function ResultScreen() {
             <p>
               Level {level} — {levelConfig.name} voltooid!
             </p>
-            {level < 9 && <p>Volgende level is unlocked!</p>}
+            {level < maxLevel && <p>Volgende level is unlocked!</p>}
           </>
         ) : (
           <>
@@ -52,6 +57,15 @@ export function ResultScreen() {
               {lastRaceResult?.failureReason ??
                 "Probeer opnieuw met een betere auto of upgrades!"}
             </p>
+            {!won && recommended && (
+              <p className="result-car-tip">
+                Tip: de <strong>{recommended.name}</strong> past het best bij
+                deze baan
+                {track.recommendedCarTip
+                  ? ` — ${track.recommendedCarTip}`
+                  : `. ${recommended.description}`}
+              </p>
+            )}
             <p>Blijf op level {level} en verdien meer credits.</p>
           </>
         )}
@@ -61,7 +75,7 @@ export function ResultScreen() {
           style={{ marginTop: 16 }}
           onClick={continueAfterResult}
         >
-          {won && level < 9 ? "Volgende level!" : "Nieuwe ronde!"}
+          {won && level < maxLevel ? "Volgende level!" : "Nieuwe ronde!"}
         </button>
       </div>
     </ScreenShell>

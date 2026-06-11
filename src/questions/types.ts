@@ -7,6 +7,7 @@ export interface QuestionVisualData {
   coins?: number[];
   bills?: number[];
   measureValue?: number;
+  measureMax?: number;
   measureUnit?: string;
   measureTarget?: string;
 }

@@ -4,6 +4,7 @@ import { getLevel, getTrack } from "../config/loadConfig";
 import { getCar } from "../config/loadConfig";
 import { ScreenShell } from "../ui/ScreenShell";
 import { SegmentIcon } from "../ui/icons";
+import { audio } from "../audio/audio";
 
 const Race3D = lazy(() =>
   import("../race3d/Race3D").then((m) => ({ default: m.Race3D })),
@@ -33,6 +34,12 @@ export function RaceScreen() {
     }
   }, [started, lastRaceResult, runRace]);
 
+  // Race soundtrack: play while this screen is mounted.
+  useEffect(() => {
+    audio.startRaceMusic();
+    return () => audio.stopMusic();
+  }, []);
+
   // Safety net: if the replay somehow has no frames, advance after a beat.
   useEffect(() => {
     if (started && lastRaceResult && (raceReplay?.frames.length ?? 0) === 0) {
@@ -54,6 +61,16 @@ export function RaceScreen() {
       <p style={{ textAlign: "center", fontFamily: "Rajdhani, sans-serif" }}>
         {car?.name ?? "Auto"} rijdt!
       </p>
+      {raceReplay?.timeLimitSec != null && (
+        <p className="race-par-hint">
+          Par-tijd:{" "}
+          {Math.floor(raceReplay.timeLimitSec / 60)}:
+          {String(Math.floor(raceReplay.timeLimitSec % 60)).padStart(2, "0")}
+          {raceReplay.timeLimitSec % 1 >= 0.05
+            ? `.${Math.floor((raceReplay.timeLimitSec % 1) * 10)}`
+            : ""}
+        </p>
+      )}
       <div className="segment-row">
         {track.segments.map((seg, i) => (
           <SegmentIcon key={i} type={seg.type} size={28} />

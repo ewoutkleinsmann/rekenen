@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { useGameStore } from "../game/store";
+import { audio } from "../audio/audio";
+import { MuteToggle } from "../ui/MuteToggle";
 import { TitleScreen } from "./TitleScreen";
+import { IntroScreen } from "./IntroScreen";
 import { QuizRound } from "./QuizRound";
 import { ShopScreen } from "./ShopScreen";
 import { CarSelectScreen } from "./CarSelectScreen";
@@ -15,21 +18,12 @@ function isRaceDevMode(): boolean {
   );
 }
 
-export function GameApp() {
-  const phase = useGameStore((s) => s.phase);
-  const init = useGameStore((s) => s.init);
-
-  useEffect(() => {
-    if (!isRaceDevMode()) init();
-  }, [init]);
-
-  if (isRaceDevMode()) {
-    return <RaceDevScreen />;
-  }
-
+function renderPhase(phase: string) {
   switch (phase) {
     case "title":
       return <TitleScreen />;
+    case "intro":
+      return <IntroScreen />;
     case "quiz":
       return <QuizRound />;
     case "shop":
@@ -43,4 +37,35 @@ export function GameApp() {
     default:
       return <TitleScreen />;
   }
+}
+
+export function GameApp() {
+  const phase = useGameStore((s) => s.phase);
+  const init = useGameStore((s) => s.init);
+
+  useEffect(() => {
+    if (!isRaceDevMode()) init();
+  }, [init]);
+
+  // Unlock the audio context on the first user gesture (autoplay policy).
+  useEffect(() => {
+    const unlock = () => audio.unlock();
+    window.addEventListener("pointerdown", unlock, { once: true });
+    window.addEventListener("keydown", unlock, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
+  }, []);
+
+  if (isRaceDevMode()) {
+    return <RaceDevScreen />;
+  }
+
+  return (
+    <>
+      <MuteToggle className="hw-mute-fixed" />
+      {renderPhase(phase)}
+    </>
+  );
 }

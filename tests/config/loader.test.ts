@@ -8,9 +8,10 @@ import {
 } from "../../src/config/loadConfig";
 
 describe("config loader", () => {
-  it("loads all 9 levels", () => {
+  it("loads all 19 levels", () => {
     expect(getLevel(1).baseTimeMs).toBe(15000);
     expect(getLevel(9).baseTimeMs).toBe(7000);
+    expect(getLevel(19).baseTimeMs).toBe(4700);
   });
 
   it("loads tracks per level", () => {

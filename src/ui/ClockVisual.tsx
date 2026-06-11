@@ -20,14 +20,22 @@ export function ClockVisual({ data }: Props) {
         </span>
         <style>{`
           .visual-clock.digital {
-            font-size: 2.5rem; font-weight: 700; text-align: center;
+            position: relative;
+            font-size: 3rem; font-weight: 700; text-align: center;
+            letter-spacing: 0.06em;
             color: var(--hw-yellow, #ffe600);
             font-family: Rajdhani, sans-serif;
             font-variant-numeric: tabular-nums;
-            padding: 1rem; background: var(--hw-dark, #1a1a2e);
-            border: 3px solid var(--hw-orange, #ff6b00);
-            border-radius: 8px;
-            max-width: 200px; margin: 0 auto;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(165deg, #20253c 0%, #11152a 100%);
+            border: 1px solid rgba(255, 140, 0, 0.5);
+            border-radius: 14px;
+            max-width: 240px; margin: 0 auto;
+            text-shadow: 0 0 12px rgba(255, 230, 0, 0.55);
+            box-shadow:
+              0 8px 20px -6px rgba(0, 0, 0, 0.6),
+              inset 0 2px 8px rgba(0, 0, 0, 0.6),
+              inset 0 0 0 1px rgba(255, 255, 255, 0.04);
           }
         `}</style>
       </div>

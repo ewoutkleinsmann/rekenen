@@ -70,6 +70,14 @@ export function getScoringConfig() {
   return scoringConfig;
 }
 
+export function getMaxLevelId(): number {
+  let max = 1;
+  for (const l of levelsConfig.levels) {
+    if (l.id > max) max = l.id;
+  }
+  return max;
+}
+
 export function getLevel(id: number): LevelConfig {
   const level = levelsConfig.levels.find((l) => l.id === id);
   if (!level) throw new Error(`Level ${id} not found`);

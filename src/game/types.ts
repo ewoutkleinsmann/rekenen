@@ -2,6 +2,7 @@ import type { CarStats } from "../config/schemas";
 
 export type GamePhase =
   | "title"
+  | "intro"
   | "quiz"
   | "shop"
   | "selectCar"

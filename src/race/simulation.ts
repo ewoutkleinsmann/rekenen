@@ -11,6 +11,7 @@ import {
   TRACK_Y,
 } from "./physics/constants";
 import { checkCurveOngoing, checkSegmentEntry } from "./physics/segmentRules";
+import { maxCurveSpeedForSegment } from "../race3d/sim/segmentRules";
 import {
   buildTrack,
   getSegmentAtDist,
@@ -24,10 +25,6 @@ const PX_PER_TICK_SCALE = 2.5;
 export function getPlaybackDurationMs(totalTicks: number): number {
   const simMs = totalTicks * SIM_DT * 1000;
   return Math.max(MIN_RACE_MS, simMs);
-}
-
-function maxCurveSpeed(stats: EffectiveStats, radius: number): number {
-  return ((stats.handling + stats.grip) / 2) * (radius / 30);
 }
 
 function accelRate(stats: EffectiveStats): number {
@@ -81,6 +78,18 @@ function fail(
     keyframes,
     totalTicks: tick,
   };
+}
+
+const CURVE_BRAKE = 4;
+
+function brakeForUpcomingCurve(
+  velocity: number,
+  stats: EffectiveStats,
+  curve: TrackSegment & { type: "curve" },
+): number {
+  const maxV = maxCurveSpeedForSegment(stats, curve);
+  if (velocity <= maxV) return velocity;
+  return Math.max(0, velocity - stats.handling * CURVE_BRAKE * SIM_DT);
 }
 
 interface CrossFail {
@@ -157,14 +166,19 @@ export function simulate(
     const airborne = seg.type === "jump" && pathDist > segMeta.startDist + 20;
 
     switch (seg.type) {
-      case "straight":
+      case "straight": {
         velocity = Math.min(
           maxSpeed(stats),
           velocity + accelRate(stats) * SIM_DT,
         );
+        const next = segments[segMeta.index + 1];
+        if (next?.type === "curve") {
+          velocity = brakeForUpcomingCurve(velocity, stats, next);
+        }
         break;
+      }
       case "curve": {
-        const maxV = maxCurveSpeed(stats, seg.radius);
+        const maxV = maxCurveSpeedForSegment(stats, seg);
         if (velocity > maxV) {
           velocity -= stats.handling * 4 * SIM_DT;
         }

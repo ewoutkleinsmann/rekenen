@@ -8,7 +8,7 @@ import { SpeedLinesDecor } from "../ui/decor/SpeedLinesDecor";
 export function TitleScreen() {
   const [name, setName] = useState("");
   const newGame = useGameStore((s) => s.newGame);
-  const startQuiz = useGameStore((s) => s.startQuiz);
+  const startLevel = useGameStore((s) => s.startLevel);
   const init = useGameStore((s) => s.init);
   const level = useGameStore((s) => s.level);
 
@@ -48,7 +48,8 @@ export function TitleScreen() {
             onClick={() => {
               init();
               const phase = saved?.phase ?? "quiz";
-              if (phase === "quiz" && !saved?.roundState) startQuiz();
+              if ((phase === "quiz" || phase === "intro") && !saved?.roundState)
+                startLevel();
             }}
           >
             Verder spelen — Level {saved?.level ?? level}
@@ -59,7 +60,7 @@ export function TitleScreen() {
           className="hw-btn hw-btn-secondary"
           onClick={() => {
             newGame(name || undefined);
-            startQuiz();
+            startLevel();
           }}
         >
           {hasSave ? "Nieuw spel" : "Start Engine!"}

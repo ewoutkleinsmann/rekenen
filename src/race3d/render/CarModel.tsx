@@ -6,6 +6,7 @@ import { getCarModel, CAR_LENGTH, type CarModelDef } from "./carModels";
 import { sampleReplay, makeSampledState } from "./sampleReplay";
 import type { RaceReplay } from "../sim/types";
 import type { PlaybackRef } from "./playback";
+import { raceProgress } from "./playback";
 
 interface Props {
   carId?: string;
@@ -32,10 +33,7 @@ export function CarModel({ carId, replay, playback }: Props) {
 
   useFrame(() => {
     const pb = playback.current;
-    const progress =
-      pb.startTime != null
-        ? Math.min(1, (performance.now() - pb.startTime) / pb.durationMs)
-        : 0;
+    const progress = raceProgress(pb);
     sampleReplay(replay, progress, state);
 
     if (root.current) {
@@ -92,9 +90,19 @@ function GLBCar({ url }: { url: string }) {
     const scale = CAR_LENGTH / longest;
     clone.scale.setScalar(scale);
     clone.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh) {
-        o.castShadow = true;
-        o.receiveShadow = true;
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      const mats = Array.isArray(mesh.material)
+        ? mesh.material
+        : [mesh.material];
+      for (const mat of mats) {
+        if (!mat || !("roughness" in mat)) continue;
+        const std = mat as THREE.MeshStandardMaterial;
+        std.envMapIntensity = 1.1;
+        std.roughness = Math.min(std.roughness, 0.45);
+        std.metalness = Math.max(std.metalness, 0.35);
       }
     });
     return clone;
@@ -116,7 +124,12 @@ function Wheel({ refObj }: { refObj: React.RefObject<THREE.Mesh | null> }) {
       <cylinderGeometry
         args={[WHEEL_RADIUS, WHEEL_RADIUS, WHEEL_WIDTH, 18]}
       />
-      <meshStandardMaterial color="#111418" roughness={0.7} metalness={0.1} />
+      <meshStandardMaterial
+        color="#1a1e24"
+        roughness={0.55}
+        metalness={0.35}
+        envMapIntensity={0.6}
+      />
     </mesh>
   );
 }
@@ -140,34 +153,50 @@ function ProceduralCar({
         {/* Lower chassis */}
         <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
           <boxGeometry args={[1.9, 0.5, 4.0]} />
-          <meshStandardMaterial
+          <meshPhysicalMaterial
             color={model.accent}
-            roughness={0.5}
-            metalness={0.3}
+            roughness={0.35}
+            metalness={0.55}
+            clearcoat={0.5}
+            clearcoatRoughness={0.15}
+            envMapIntensity={1.2}
           />
         </mesh>
         {/* Main shell */}
         <mesh position={[0, 0.85, -0.15]} castShadow receiveShadow>
           <boxGeometry args={[1.75, 0.55, 3.0]} />
-          <meshStandardMaterial
+          <meshPhysicalMaterial
             color={model.color}
-            roughness={0.35}
-            metalness={0.45}
+            roughness={0.22}
+            metalness={0.65}
+            clearcoat={0.85}
+            clearcoatRoughness={0.08}
+            envMapIntensity={1.35}
           />
         </mesh>
         {/* Cabin */}
         <mesh position={[0, 1.28, 0.05]} castShadow>
           <boxGeometry args={[1.45, 0.5, 1.5]} />
-          <meshStandardMaterial
-            color="#0b0f14"
-            roughness={0.1}
-            metalness={0.6}
+          <meshPhysicalMaterial
+            color="#141a22"
+            roughness={0.05}
+            metalness={0.75}
+            clearcoat={1}
+            clearcoatRoughness={0.03}
+            envMapIntensity={1.5}
           />
         </mesh>
         {/* Nose wedge */}
         <mesh position={[0, 0.72, -1.85]} castShadow>
           <boxGeometry args={[1.7, 0.3, 0.6]} />
-          <meshStandardMaterial color={model.color} roughness={0.35} metalness={0.45} />
+          <meshPhysicalMaterial
+            color={model.color}
+            roughness={0.2}
+            metalness={0.6}
+            clearcoat={0.75}
+            clearcoatRoughness={0.1}
+            envMapIntensity={1.3}
+          />
         </mesh>
         {/* Headlights */}
         <mesh position={[0.55, 0.8, -2.05]}>

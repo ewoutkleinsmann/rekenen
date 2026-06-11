@@ -27,9 +27,12 @@ export function canBuyCar(
   carId: string,
   ownedCars: CarInstance[],
   credits: number,
+  playerLevel: number,
 ): boolean {
   const car = getCar(carId);
   if (ownedCars.some((c) => c.carId === carId)) return false;
+  const minLevel = car.minUnlockLevel ?? 1;
+  if (playerLevel < minLevel) return false;
   return credits >= car.price;
 }
 
@@ -37,11 +40,12 @@ export function buyCar(
   carId: string,
   ownedCars: CarInstance[],
   credits: number,
+  playerLevel: number,
 ): {
   cars: CarInstance[];
   credits: number;
 } | null {
-  if (!canBuyCar(carId, ownedCars, credits)) return null;
+  if (!canBuyCar(carId, ownedCars, credits, playerLevel)) return null;
   const car = getCar(carId);
   return {
     cars: [...ownedCars, createCarInstance(carId)],
@@ -77,7 +81,14 @@ export function getAvailableUpgrades() {
   return getUpgradesConfig().upgrades;
 }
 
-export function getPurchasableCars(ownedCars: CarInstance[]) {
+export function getPurchasableCars(
+  ownedCars: CarInstance[],
+  playerLevel: number,
+) {
   const ownedIds = new Set(ownedCars.map((c) => c.carId));
-  return getCarsConfig().cars.filter((c) => !ownedIds.has(c.id));
+  return getCarsConfig().cars.filter((c) => {
+    if (ownedIds.has(c.id)) return false;
+    const minLevel = c.minUnlockLevel ?? 1;
+    return playerLevel >= minLevel;
+  });
 }

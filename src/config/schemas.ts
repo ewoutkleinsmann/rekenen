@@ -14,6 +14,8 @@ export const CarSchema = z.object({
   name: z.string(),
   description: z.string(),
   price: z.number(),
+  /** Player level at which this car appears in the shop (starter is always owned). */
+  minUnlockLevel: z.number().int().positive().optional(),
   stats: CarStatsSchema,
   trait: z.record(z.string(), z.number()).optional(),
 });
@@ -70,7 +72,6 @@ export const TrackSegmentSchema = z.discriminatedUnion("type", [
     type: z.literal("curve"),
     radius: z.number(),
     angle: z.number(),
-    minGrip: z.number(),
     direction: z.enum(["left", "right"]).optional(),
   }),
   SegmentBase.extend({
@@ -80,14 +81,10 @@ export const TrackSegmentSchema = z.discriminatedUnion("type", [
   SegmentBase.extend({
     type: z.literal("loop"),
     radius: z.number(),
-    minEntrySpeed: z.number(),
-    minGrip: z.number(),
   }),
   SegmentBase.extend({
     type: z.literal("jump"),
     length: z.number(),
-    minSpeed: z.number(),
-    maxWeight: z.number(),
   }),
   SegmentBase.extend({
     type: z.literal("rocket"),
@@ -100,6 +97,11 @@ export const TrackSchema = z.object({
   name: z.string(),
   segments: z.array(TrackSegmentSchema),
   finishCondition: z.string(),
+  /** Par time in seconds; omit to use tier + track length formula. */
+  timeLimitSec: z.number().positive().optional(),
+  /** Best car archetype for this layout (shown as tip after a failed run). */
+  recommendedCarId: z.string().optional(),
+  recommendedCarTip: z.string().optional(),
 });
 
 export const TracksConfigSchema = z.object({

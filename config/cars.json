@@ -16,25 +16,11 @@
       "trait": { "boosterBonus": 0.15 }
     },
     {
-      "id": "grip-gt",
-      "name": "Grip GT",
-      "description": "Blijft vast in bochten en loops.",
-      "price": 120,
-      "stats": {
-        "speed": 55,
-        "acceleration": 60,
-        "handling": 80,
-        "grip": 85,
-        "boost": 50,
-        "weight": 60
-      },
-      "trait": { "loopGripBonus": 10 }
-    },
-    {
       "id": "jump-jet",
       "name": "Jump Jet",
       "description": "Licht en snel van de start, perfect voor sprongen.",
-      "price": 150,
+      "price": 360,
+      "minUnlockLevel": 4,
       "stats": {
         "speed": 65,
         "acceleration": 85,
@@ -49,7 +35,8 @@
       "id": "loop-king",
       "name": "Loop King",
       "description": "Koning van de loop-the-loop!",
-      "price": 200,
+      "price": 440,
+      "minUnlockLevel": 5,
       "stats": {
         "speed": 70,
         "acceleration": 65,
@@ -58,13 +45,30 @@
         "boost": 45,
         "weight": 50
       },
-      "trait": { "loopSpeedBonus": 8 }
+      "trait": { "loopSpeedBonus": 8, "loopGripBonus": 6 }
+    },
+    {
+      "id": "grip-gt",
+      "name": "Grip GT",
+      "description": "Blijft vast in bochten en loops.",
+      "price": 420,
+      "minUnlockLevel": 7,
+      "stats": {
+        "speed": 55,
+        "acceleration": 60,
+        "handling": 80,
+        "grip": 85,
+        "boost": 50,
+        "weight": 60
+      },
+      "trait": { "loopGripBonus": 10 }
     },
     {
       "id": "rocket-racer",
       "name": "Rocket Racer",
-      "description": "Ontgrendeld met Baan Blaster upgrades.",
-      "price": 250,
+      "description": "Gebouwd voor raketstukken op de baan.",
+      "price": 520,
+      "minUnlockLevel": 17,
       "stats": {
         "speed": 80,
         "acceleration": 75,
@@ -76,6 +80,6 @@
       "trait": { "rocketBonus": 0.25 }
     }
   ],
-  "statMax": 100,
+  "statMax": 115,
   "statMin": 10
 }

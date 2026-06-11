@@ -112,7 +112,7 @@
         "duration_minutes",
         "table_6",
         "money_mixed",
-        "add_sub_1000"
+        "add_sub_100"
       ],
       "trackId": "track-07"
     },
@@ -124,7 +124,6 @@
       "questionCategories": [
         "table_6",
         "money_mixed",
-        "add_sub_1000",
         "skip_count_7",
         "skip_count_100",
         "add_sub_100"
@@ -145,6 +144,168 @@
         "table_read"
       ],
       "trackId": "track-09"
+    },
+    {
+      "id": 10,
+      "blok": 10,
+      "name": "Autobahn Alley",
+      "baseTimeMs": 6500,
+      "questionCategories": [
+        "skip_count_7",
+        "skip_count_100",
+        "add_sub_100",
+        "skip_count_9",
+        "skip_count_10_100",
+        "table_read",
+        "table_fill_gap"
+      ],
+      "trackId": "track-10"
+    },
+    {
+      "id": 11,
+      "blok": 11,
+      "name": "Velocity Viaduct",
+      "baseTimeMs": 6300,
+      "questionCategories": [
+        "skip_count_7",
+        "skip_count_100",
+        "add_sub_100",
+        "skip_count_9",
+        "skip_count_10_100",
+        "table_read",
+        "table_fill_gap",
+        "table_mult"
+      ],
+      "trackId": "track-11"
+    },
+    {
+      "id": 12,
+      "blok": 12,
+      "name": "Chicane Charge",
+      "baseTimeMs": 6100,
+      "questionCategories": [
+        "skip_count_100",
+        "add_sub_100",
+        "skip_count_9",
+        "skip_count_10_100",
+        "table_read",
+        "table_fill_gap",
+        "table_mult"
+      ],
+      "trackId": "track-12"
+    },
+    {
+      "id": 13,
+      "blok": 13,
+      "name": "Marathon Mix",
+      "baseTimeMs": 5900,
+      "questionCategories": [
+        "skip_count_100",
+        "add_sub_100",
+        "skip_count_9",
+        "skip_count_10_100",
+        "table_read",
+        "table_fill_gap",
+        "table_mult",
+        "measure_story"
+      ],
+      "trackId": "track-13"
+    },
+    {
+      "id": 14,
+      "blok": 14,
+      "name": "Twin Loop Titan",
+      "baseTimeMs": 5700,
+      "questionCategories": [
+        "add_sub_100",
+        "skip_count_9",
+        "skip_count_10_100",
+        "table_read",
+        "table_fill_gap",
+        "table_mult",
+        "measure_story"
+      ],
+      "trackId": "track-14"
+    },
+    {
+      "id": 15,
+      "blok": 15,
+      "name": "Hairpin Express",
+      "baseTimeMs": 5500,
+      "questionCategories": [
+        "skip_count_9",
+        "skip_count_10_100",
+        "table_read",
+        "table_fill_gap",
+        "table_mult",
+        "measure_story",
+        "money_story"
+      ],
+      "trackId": "track-15"
+    },
+    {
+      "id": 16,
+      "blok": 16,
+      "name": "Skybridge Saga",
+      "baseTimeMs": 5300,
+      "questionCategories": [
+        "skip_count_10_100",
+        "table_read",
+        "table_fill_gap",
+        "table_mult",
+        "measure_story",
+        "money_story",
+        "money_visual"
+      ],
+      "trackId": "track-16"
+    },
+    {
+      "id": 17,
+      "blok": 17,
+      "name": "Rocket Runway",
+      "baseTimeMs": 5100,
+      "questionCategories": [
+        "table_read",
+        "table_fill_gap",
+        "table_mult",
+        "measure_story",
+        "money_story",
+        "money_visual",
+        "duration_minutes"
+      ],
+      "trackId": "track-17"
+    },
+    {
+      "id": 18,
+      "blok": 18,
+      "name": "Grande Gauntlet",
+      "baseTimeMs": 4900,
+      "questionCategories": [
+        "table_fill_gap",
+        "table_mult",
+        "measure_story",
+        "money_story",
+        "money_visual",
+        "duration_minutes",
+        "table_6"
+      ],
+      "trackId": "track-18"
+    },
+    {
+      "id": 19,
+      "blok": 19,
+      "name": "Ultimate Crown",
+      "baseTimeMs": 4700,
+      "questionCategories": [
+        "table_mult",
+        "measure_story",
+        "money_story",
+        "money_visual",
+        "duration_minutes",
+        "table_6",
+        "table_8"
+      ],
+      "trackId": "track-19"
     }
   ]
 }

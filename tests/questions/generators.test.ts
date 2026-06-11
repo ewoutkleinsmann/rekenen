@@ -80,4 +80,66 @@ describe("question generators", () => {
     );
     expect(prompts.size).toBeGreaterThan(5);
   });
+
+  it("never produces negative answers for add/subtract categories", () => {
+    const arithmetic = [
+      "add_sub_30",
+      "add_sub_100",
+      "add_sub_from_ten",
+      "add_sub_tens",
+    ];
+    for (const cat of arithmetic) {
+      for (let seed = 0; seed < 200; seed++) {
+        for (let i = 0; i < 5; i++) {
+          const q = generateQuestion(1, seed, i, cat);
+          expect(q.correctAnswer).toBeGreaterThanOrEqual(0);
+        }
+      }
+    }
+  });
+
+  it("keeps add/subtract answers within 100 (groep 4 scope)", () => {
+    const within100 = ["add_sub_30", "add_sub_100", "add_sub_tens"];
+    for (const cat of within100) {
+      for (let seed = 0; seed < 200; seed++) {
+        for (let i = 0; i < 5; i++) {
+          const q = generateQuestion(1, seed, i, cat);
+          expect(q.correctAnswer).toBeLessThanOrEqual(100);
+        }
+      }
+    }
+  });
+
+  it("does not reveal the answer in the measure_visual prompt", () => {
+    for (let i = 0; i < 20; i++) {
+      const q = generateQuestion(4, 7, i, "measure_visual");
+      expect(q.display).toBe("measure");
+      expect(q.visualData?.measureValue).toBe(q.correctAnswer);
+      expect(q.prompt).not.toContain(String(q.correctAnswer));
+    }
+  });
+
+  it("randomizes money_visual totals", () => {
+    const totals = new Set(
+      Array.from(
+        { length: 12 },
+        (_, i) => generateQuestion(3, 5, i, "money_visual").correctAnswer,
+      ),
+    );
+    expect(totals.size).toBeGreaterThan(3);
+  });
+
+  it("makes duration_minutes require computing the gap", () => {
+    const q = generateQuestion(6, 3, 0, "duration_minutes");
+    expect(q.prompt).toMatch(/begint om .* eindigt om/);
+  });
+
+  it("generates real table_fill_gap and table_read questions", () => {
+    const gap = generateQuestion(9, 11, 0, "table_fill_gap");
+    expect(gap.prompt).toContain("×");
+    expect(gap.prompt).toContain("?");
+    const read = generateQuestion(9, 11, 0, "table_read");
+    expect(read.prompt).toContain("Tafel van");
+    expect(read.prompt).toContain("?");
+  });
 });
