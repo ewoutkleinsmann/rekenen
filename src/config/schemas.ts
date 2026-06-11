@@ -71,6 +71,7 @@ export const TrackSegmentSchema = z.discriminatedUnion("type", [
     radius: z.number(),
     angle: z.number(),
     minGrip: z.number(),
+    direction: z.enum(["left", "right"]).optional(),
   }),
   SegmentBase.extend({
     type: z.literal("booster"),

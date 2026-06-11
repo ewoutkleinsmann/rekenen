@@ -1,21 +1,23 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { useGameStore } from "../game/store";
 import { getLevel, getTrack } from "../config/loadConfig";
 import { getCar } from "../config/loadConfig";
-import { RaceCanvas } from "../race/RaceCanvas";
 import { ScreenShell } from "../ui/ScreenShell";
 import { SegmentIcon } from "../ui/icons";
+
+const Race3D = lazy(() =>
+  import("../race3d/Race3D").then((m) => ({ default: m.Race3D })),
+);
 
 export function RaceScreen() {
   const level = useGameStore((s) => s.level);
   const ownedCars = useGameStore((s) => s.ownedCars);
   const selectedCarInstanceId = useGameStore((s) => s.selectedCarInstanceId);
-  const raceKeyframes = useGameStore((s) => s.raceKeyframes);
+  const raceReplay = useGameStore((s) => s.raceReplay);
   const runRace = useGameStore((s) => s.runRace);
   const finishRace = useGameStore((s) => s.finishRace);
   const lastRaceResult = useGameStore((s) => s.lastRaceResult);
   const [started, setStarted] = useState(false);
-  const keyframes = raceKeyframes ?? [];
 
   const levelConfig = getLevel(level);
   const track = getTrack(levelConfig.trackId);
@@ -26,17 +28,18 @@ export function RaceScreen() {
 
   useEffect(() => {
     if (!started && !lastRaceResult) {
-      runRace();
+      void runRace();
       setStarted(true);
     }
   }, [started, lastRaceResult, runRace]);
 
+  // Safety net: if the replay somehow has no frames, advance after a beat.
   useEffect(() => {
-    if (started && keyframes.length === 0 && lastRaceResult) {
+    if (started && lastRaceResult && (raceReplay?.frames.length ?? 0) === 0) {
       const t = setTimeout(finishRace, 500);
       return () => clearTimeout(t);
     }
-  }, [started, keyframes.length, lastRaceResult, finishRace]);
+  }, [started, raceReplay, lastRaceResult, finishRace]);
 
   return (
     <ScreenShell
@@ -56,14 +59,26 @@ export function RaceScreen() {
           <SegmentIcon key={i} type={seg.type} size={28} />
         ))}
       </div>
-      <RaceCanvas
-        keyframes={keyframes}
-        segments={track.segments}
-        success={lastRaceResult?.success ?? false}
-        playing={keyframes.length > 0}
-        carId={car?.id}
-        onComplete={finishRace}
-      />
+      {raceReplay && raceReplay.frames.length > 0 ? (
+        <Suspense
+          fallback={
+            <div className="race3d-wrap">
+              <div className="race3d-loading">3D-motor laden…</div>
+            </div>
+          }
+        >
+          <Race3D
+            track={track}
+            car={{ carId: car?.id, name: car?.name }}
+            replay={raceReplay}
+            onComplete={finishRace}
+          />
+        </Suspense>
+      ) : (
+        <div className="race3d-wrap">
+          <div className="race3d-loading">Race klaarzetten…</div>
+        </div>
+      )}
     </ScreenShell>
   );
 }

@@ -12,9 +12,14 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.19.3",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "@react-three/postprocessing": "^3.0.4",
     "matter-js": "^0.20.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "three": "^0.184.0",
     "zod": "^4.4.3",
     "zustand": "^5.0.14"
   },
@@ -26,6 +31,7 @@
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.184.1",
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/coverage-v8": "^4.1.8",
     "eslint": "^10.3.0",

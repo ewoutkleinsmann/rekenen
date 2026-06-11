@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { Suspense, lazy, useCallback, useState } from "react";
 import {
   getCar,
   getCarsConfig,
@@ -7,11 +7,14 @@ import {
 } from "../config/loadConfig";
 import { computeEffectiveStats } from "../garage/stats";
 import type { CarInstance } from "../game/types";
-import { simulateRace, getPlaybackDurationMs } from "../race/simulation";
-import type { SimulationResult } from "../race/types";
-import { RaceCanvas } from "../race/RaceCanvas";
+import { simulateRace3D } from "../race3d/sim/simulateRace3d";
+import type { RaceReplay } from "../race3d/sim/types";
 import { ScreenShell } from "../ui/ScreenShell";
 import { SegmentIcon } from "../ui/icons";
+
+const Race3D = lazy(() =>
+  import("../race3d/Race3D").then((m) => ({ default: m.Race3D })),
+);
 
 export function RaceDevScreen() {
   const tracks = getTracksConfig().tracks;
@@ -20,13 +23,14 @@ export function RaceDevScreen() {
   const [trackId, setTrackId] = useState(tracks[0]?.id ?? "track-01");
   const [carId, setCarId] = useState(cars[0]?.id ?? "booster-blaze");
   const [rocketUnlock, setRocketUnlock] = useState(false);
-  const [result, setResult] = useState<SimulationResult | null>(null);
+  const [replay, setReplay] = useState<RaceReplay | null>(null);
+  const [running, setRunning] = useState(false);
   const [runId, setRunId] = useState(0);
 
   const track = getTrack(trackId);
   const car = getCar(carId);
 
-  const run = useCallback(() => {
+  const run = useCallback(async () => {
     const instance: CarInstance = {
       instanceId: "dev",
       carId,
@@ -35,11 +39,12 @@ export function RaceDevScreen() {
         : [],
     };
     const stats = computeEffectiveStats(instance);
-    setResult(simulateRace(stats, track.segments));
+    setRunning(true);
+    const result = await simulateRace3D(stats, track);
+    setReplay(result);
     setRunId((n) => n + 1);
-  }, [carId, rocketUnlock, track.segments]);
-
-  const playbackMs = result ? getPlaybackDurationMs(result.totalTicks) : 0;
+    setRunning(false);
+  }, [carId, rocketUnlock, track]);
 
   return (
     <ScreenShell variant="race" className="race-dev-screen" badge="Race Dev">
@@ -47,7 +52,7 @@ export function RaceDevScreen() {
         Race Dev
       </h2>
       <p className="hw-subtitle" style={{ textAlign: "center" }}>
-        Test een track + auto combinatie
+        Test een track + auto combinatie in 3D
       </p>
 
       <div className="race-dev-controls hw-panel-track">
@@ -90,23 +95,29 @@ export function RaceDevScreen() {
           Rocket unlock (Baan Blaster)
         </label>
 
-        <button type="button" className="hw-btn hw-btn-primary" onClick={run}>
-          {result ? "Opnieuw" : "Start race"}
+        <button
+          type="button"
+          className="hw-btn hw-btn-primary"
+          onClick={() => void run()}
+          disabled={running}
+        >
+          {running ? "Bezig…" : replay ? "Opnieuw" : "Start race"}
         </button>
       </div>
 
-      {result && (
+      {replay && (
         <div className="race-dev-debug">
-          <strong>{result.success ? "Geslaagd" : "Gefaald"}</strong>
-          {!result.success && result.failureReason && (
-            <span> — {result.failureReason}</span>
+          <strong>{replay.success ? "Geslaagd" : "Gefaald"}</strong>
+          {!replay.success && replay.failureReason && (
+            <span> — {replay.failureReason}</span>
           )}
-          {!result.success && result.failureSegmentIndex !== undefined && (
-            <span> (segment {result.failureSegmentIndex})</span>
+          {!replay.success && replay.failureSegmentIndex !== undefined && (
+            <span> (segment {replay.failureSegmentIndex})</span>
           )}
           <div className="race-dev-meta">
-            ticks: {result.totalTicks} · keyframes: {result.keyframes.length} ·
-            playback: ~{(playbackMs / 1000).toFixed(1)}s
+            frames: {replay.frames.length} · simtijd:{" "}
+            {replay.totalTime.toFixed(1)}s · playback: ~
+            {(replay.durationMs / 1000).toFixed(1)}s
           </div>
         </div>
       )}
@@ -117,21 +128,27 @@ export function RaceDevScreen() {
         ))}
       </div>
 
-      {result && result.keyframes.length > 0 && (
+      {replay && replay.frames.length > 0 && (
         <>
           <p
             style={{ textAlign: "center", fontFamily: "Rajdhani, sans-serif" }}
           >
             {car.name} op {track.name}
           </p>
-          <RaceCanvas
-            key={runId}
-            keyframes={result.keyframes}
-            segments={track.segments}
-            success={result.success}
-            playing
-            carId={car.id}
-          />
+          <Suspense
+            fallback={
+              <div className="race3d-wrap">
+                <div className="race3d-loading">3D-motor laden…</div>
+              </div>
+            }
+          >
+            <Race3D
+              key={runId}
+              track={track}
+              car={{ carId: car.id, name: car.name }}
+              replay={replay}
+            />
+          </Suspense>
         </>
       )}
     </ScreenShell>

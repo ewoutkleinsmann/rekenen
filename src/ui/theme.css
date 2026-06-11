@@ -630,6 +630,44 @@ body {
   height: 320px;
 }
 
+/* 3D race */
+.race3d-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  border: 3px solid var(--hw-orange);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #0b1622;
+  box-shadow: var(--shadow-panel);
+}
+
+.race3d-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 360px;
+}
+
+.race3d-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: radial-gradient(circle at 50% 40%, #1c3350, #0b1622);
+}
+
+@media (min-width: 720px) {
+  .race3d-wrap canvas {
+    height: 440px;
+  }
+}
+
 /* Screen layouts */
 .screen-shell {
   position: relative;

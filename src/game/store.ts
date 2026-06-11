@@ -7,12 +7,12 @@ import { validateAnswer } from "../questions/registry";
 import { buyCar, applyUpgrade } from "../garage/shop";
 import { computeEffectiveStats } from "../garage/stats";
 import { getLevel, getTrack } from "../config/loadConfig";
-import { simulateRace } from "../race/simulation";
+import type { RaceReplay } from "../race3d/sim/types";
 import type { Question } from "../questions/types";
 
 interface GameStore extends GameSave {
   questions: Question[];
-  raceKeyframes: import("../race/types").RaceKeyframe[] | null;
+  raceReplay: RaceReplay | null;
   init: () => void;
   newGame: (name?: string) => void;
   setPhase: (phase: GamePhase) => void;
@@ -22,7 +22,7 @@ interface GameStore extends GameSave {
   buyCarAction: (carId: string) => boolean;
   buyUpgradeAction: (instanceId: string, upgradeId: string) => boolean;
   selectCar: (instanceId: string) => void;
-  runRace: () => void;
+  runRace: () => Promise<void>;
   finishRace: () => void;
   continueAfterResult: () => void;
   persist: () => void;
@@ -41,7 +41,7 @@ function newRoundState(seed: number): RoundState {
 export const useGameStore = create<GameStore>((set, get) => ({
   ...createNewSave(),
   questions: [],
-  raceKeyframes: null,
+  raceReplay: null,
 
   init() {
     const saved = loadSave();
@@ -50,14 +50,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         saved.roundState && saved.phase === "quiz"
           ? generateRoundQuestions(saved.level, saved.roundState.seed)
           : [];
-      set({ ...saved, questions, raceKeyframes: null });
+      set({ ...saved, questions, raceReplay: null });
     }
   },
 
   newGame(name) {
     clearSave();
     const save = createNewSave(name);
-    set({ ...save, questions: [], raceKeyframes: null });
+    set({ ...save, questions: [], raceReplay: null });
     saveGame({ ...save, questions: undefined } as unknown as GameSave);
   },
 
@@ -165,7 +165,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().persist();
   },
 
-  runRace() {
+  async runRace() {
     const state = get();
     const instance = state.ownedCars.find(
       (c) => c.instanceId === state.selectedCarInstanceId,
@@ -175,19 +175,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const level = getLevel(state.level);
     const track = getTrack(level.trackId);
     const stats = computeEffectiveStats(instance);
-    const result = simulateRace(stats, track.segments);
+    const { simulateRace3D } = await import("../race3d/sim/simulateRace3d");
+    const result = await simulateRace3D(stats, track);
 
     set({
-      raceKeyframes: result.keyframes,
+      raceReplay: result,
       lastRaceResult: {
         success: result.success,
         failureReason: result.failureReason,
         carInstanceId: instance.instanceId,
       },
       stats: {
-        ...state.stats,
-        totalRaces: state.stats.totalRaces + 1,
-        racesWon: state.stats.racesWon + (result.success ? 1 : 0),
+        ...get().stats,
+        totalRaces: get().stats.totalRaces + 1,
+        racesWon: get().stats.racesWon + (result.success ? 1 : 0),
       },
     });
     get().persist();
@@ -207,7 +208,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         phase: "quiz",
         roundState: undefined,
         questions: [],
-        raceKeyframes: null,
+        raceReplay: null,
         lastRaceResult: undefined,
         selectedCarInstanceId: undefined,
       });
@@ -217,7 +218,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         phase: "quiz",
         roundState: undefined,
         questions: [],
-        raceKeyframes: null,
+        raceReplay: null,
         lastRaceResult: undefined,
         selectedCarInstanceId: undefined,
       });
@@ -228,7 +229,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   persist() {
     const {
       questions,
-      raceKeyframes,
+      raceReplay,
       init,
       newGame,
       setPhase,
@@ -245,7 +246,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ...save
     } = get();
     void questions;
-    void raceKeyframes;
+    void raceReplay;
     void init;
     void newGame;
     void setPhase;
