@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import {
   getCar,
   getCarsConfig,
@@ -24,13 +24,25 @@ export function RaceDevScreen() {
   const [carId, setCarId] = useState(cars[0]?.id ?? "booster-blaze");
   const [rocketUnlock, setRocketUnlock] = useState(false);
   const [replay, setReplay] = useState<RaceReplay | null>(null);
+  /** Track/car combo the current `replay` was simulated for (guards stale async + UI mismatch). */
+  const [replayKey, setReplayKey] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [runId, setRunId] = useState(0);
 
   const track = getTrack(trackId);
   const car = getCar(carId);
 
+  const selectionKey = `${trackId}:${carId}:${rocketUnlock ? "rocket" : "no-rocket"}`;
+
+  useEffect(() => {
+    setReplay(null);
+    setReplayKey(null);
+    setRunning(false);
+  }, [selectionKey]);
+
   const run = useCallback(async () => {
+    const runKey = selectionKey;
+    const runTrack = getTrack(trackId);
     const instance: CarInstance = {
       instanceId: "dev",
       carId,
@@ -40,11 +52,16 @@ export function RaceDevScreen() {
     };
     const stats = computeEffectiveStats(instance);
     setRunning(true);
-    const result = await simulateRace3D(stats, track);
-    setReplay(result);
-    setRunId((n) => n + 1);
-    setRunning(false);
-  }, [carId, rocketUnlock, track]);
+    try {
+      const result = await simulateRace3D(stats, runTrack);
+      if (runKey !== selectionKey) return;
+      setReplay(result);
+      setReplayKey(runKey);
+      setRunId((n) => n + 1);
+    } finally {
+      if (runKey === selectionKey) setRunning(false);
+    }
+  }, [carId, rocketUnlock, trackId, selectionKey]);
 
   return (
     <ScreenShell variant="race" className="race-dev-screen" badge="Race Dev">
@@ -105,7 +122,7 @@ export function RaceDevScreen() {
         </button>
       </div>
 
-      {replay && (
+      {replay && replayKey === selectionKey && (
         <div className="race-dev-debug">
           <strong>{replay.success ? "Geslaagd" : "Gefaald"}</strong>
           {!replay.success && replay.failureReason && (
@@ -128,7 +145,7 @@ export function RaceDevScreen() {
         ))}
       </div>
 
-      {replay && replay.frames.length > 0 && (
+      {replay && replayKey === selectionKey && replay.frames.length > 0 && (
         <>
           <p
             style={{ textAlign: "center", fontFamily: "Rajdhani, sans-serif" }}
@@ -143,7 +160,7 @@ export function RaceDevScreen() {
             }
           >
             <Race3D
-              key={runId}
+              key={`${selectionKey}-${runId}`}
               track={track}
               car={{ carId: car.id, name: car.name }}
               replay={replay}

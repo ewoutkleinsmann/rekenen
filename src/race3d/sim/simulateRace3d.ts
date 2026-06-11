@@ -64,7 +64,7 @@ function bankedUp(forward: Vec3, up: Vec3, banking: number): Vec3 {
 function poseAt(track: Track3D, dist: number): { pos: Vec3; quat: Quat } {
   const node = nodeAtDist(track.nodes, dist);
   const up = bankedUp(node.forward, node.up, node.banking);
-  const pos = add(node.pos, scale(node.up, CAR_RIDE_HEIGHT));
+  const pos = add(node.pos, scale(up, CAR_RIDE_HEIGHT));
   return { pos, quat: quatFromFrame(node.forward, up) };
 }
 

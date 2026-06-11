@@ -68,11 +68,19 @@ function pushNode(
   pos: Vec3,
   forward: Vec3,
   up: Vec3,
-  dist: number,
   segmentIndex: number,
   solid: boolean,
   banking: number,
 ) {
+  const prev = nodes[nodes.length - 1];
+  const dist = prev
+    ? prev.dist +
+      Math.hypot(
+        pos[0] - prev.pos[0],
+        pos[1] - prev.pos[1],
+        pos[2] - prev.pos[2],
+      )
+    : 0;
   nodes.push({
     pos,
     forward: normalize(forward),
@@ -92,14 +100,13 @@ export function buildTrack3d(track: TrackConfig): Track3D {
   let pos: Vec3 = [0, 0, 0];
   let forward: Vec3 = [0, 0, 1];
   let up: Vec3 = [0, 1, 0];
-  let dist = 0;
   let curveCount = 0;
 
   const startPos = pos;
   const startForward = forward;
   const startUp = up;
 
-  pushNode(nodes, pos, forward, up, dist, 0, true, 0);
+  pushNode(nodes, pos, forward, up, 0, true, 0);
 
   const advanceStraight = (
     len: number,
@@ -110,14 +117,13 @@ export function buildTrack3d(track: TrackConfig): Track3D {
     const stepLen = len / steps;
     for (let i = 0; i < steps; i++) {
       pos = add(pos, scale(forward, stepLen));
-      dist += stepLen;
-      pushNode(nodes, pos, forward, up, dist, segmentIndex, solid, 0);
+      pushNode(nodes, pos, forward, up, segmentIndex, solid, 0);
     }
   };
 
   for (let si = 0; si < segments.length; si++) {
     const seg = segments[si]!;
-    const startDist = dist;
+    const startDist = nodes[nodes.length - 1]!.dist;
 
     switch (seg.type) {
       case "straight": {
@@ -151,8 +157,7 @@ export function buildTrack3d(track: TrackConfig): Track3D {
           const rotated = rotateAround(rel, up, dAngle);
           pos = add(center, rotated);
           forward = normalize(rotateAround(forward, up, dAngle));
-          dist += arcLen / steps;
-          pushNode(nodes, pos, forward, up, dist, si, true, banking);
+          pushNode(nodes, pos, forward, up, si, true, banking);
         }
         break;
       }
@@ -170,8 +175,7 @@ export function buildTrack3d(track: TrackConfig): Track3D {
           pos = add(center, rotated);
           forward = normalize(rotateAround(forward, right, dAngle));
           up = normalize(rotateAround(up, right, dAngle));
-          dist += loopLen / steps;
-          pushNode(nodes, pos, forward, up, dist, si, true, 0);
+          pushNode(nodes, pos, forward, up, si, true, 0);
         }
         break;
       }
@@ -190,8 +194,7 @@ export function buildTrack3d(track: TrackConfig): Track3D {
           forward = normalize(rotateAround(forward, right, -rampAngle / upSteps));
           up = normalize(rotateAround(up, right, -rampAngle / upSteps));
           pos = add(pos, scale(forward, rampLen / upSteps));
-          dist += rampLen / upSteps;
-          pushNode(nodes, pos, forward, up, dist, si, true, 0);
+          pushNode(nodes, pos, forward, up, si, true, 0);
         }
 
         // Airborne ballistic gap: rise to a peak then come back to ground level.
@@ -211,8 +214,7 @@ export function buildTrack3d(track: TrackConfig): Track3D {
           // Tangent of the parabola for orientation.
           const dy = 4 * peak * (1 - 2 * t);
           const tangent = normalize([horiz[0], dy / gapLen, horiz[2]]);
-          dist += gapLen / gapSteps;
-          pushNode(nodes, gapPos, tangent, [0, 1, 0], dist, si, false, 0);
+          pushNode(nodes, gapPos, tangent, [0, 1, 0], si, false, 0);
         }
         const lastGap = nodes[nodes.length - 1]!;
         pos = lastGap.pos;
@@ -229,7 +231,7 @@ export function buildTrack3d(track: TrackConfig): Track3D {
       index: si,
       type: seg.type,
       startDist,
-      endDist: dist,
+      endDist: nodes[nodes.length - 1]!.dist,
       segment: seg,
     });
   }
@@ -237,7 +239,7 @@ export function buildTrack3d(track: TrackConfig): Track3D {
   // Final finish runway so the car has room to roll out.
   advanceStraight(20, segments.length - 1, true);
 
-  const totalLength = dist;
+  const totalLength = nodes[nodes.length - 1]!.dist;
   const finishDist = segMetas[segMetas.length - 1]?.endDist ?? totalLength;
 
   const colliders = buildColliders(nodes);

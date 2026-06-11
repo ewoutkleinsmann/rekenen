@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { simulateRace3D } from "../../src/race3d/sim/simulateRace3d";
+import { buildTrack3d } from "../../src/race3d/sim/buildTrack3d";
 import { computeEffectiveStats } from "../../src/garage/stats";
 import { getTrack } from "../../src/config/loadConfig";
 import type { CarInstance } from "../../src/game/types";
@@ -64,6 +65,23 @@ describe("3D race simulation", () => {
     const result = await simulateRace3D(stats, getTrack("track-08"));
     expect(result.success).toBe(false);
     expect(result.failureReason).toContain("Baan Blaster");
+  });
+
+  it("keeps centerline distance aligned with 3D spacing on jump tracks", () => {
+    for (const id of ["track-04", "track-06", "track-08", "track-09"]) {
+      const built = buildTrack3d(getTrack(id));
+      for (let i = 0; i < built.nodes.length - 1; i++) {
+        const a = built.nodes[i]!;
+        const b = built.nodes[i + 1]!;
+        const eucl = Math.hypot(
+          b.pos[0] - a.pos[0],
+          b.pos[1] - a.pos[1],
+          b.pos[2] - a.pos[2],
+        );
+        const ddist = b.dist - a.dist;
+        expect(eucl).toBeCloseTo(ddist, 2);
+      }
+    }
   });
 
   it("moves the car forward from start to finish", async () => {
