@@ -139,9 +139,9 @@ export function shouldFlyOffJump(
 }
 
 export function shouldFlyOffRocket(
-  segment: TrackSegment & { type: "rocket" },
+  _segment: TrackSegment & { type: "rocket" },
   stats: EffectiveStats,
-  velocity: number,
+  _velocity: number,
 ): FlyOffResult {
   if (hasRocketSpecialist(stats) || hasBoosterSpecialist(stats)) {
     return { fly: false };

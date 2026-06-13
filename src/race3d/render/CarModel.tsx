@@ -1,8 +1,9 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import { getCarModel, CAR_LENGTH, type CarModelDef } from "./carModels";
+import { prepareGlbScene } from "./glbCar";
 import { sampleReplay, makeSampledState } from "./sampleReplay";
 import type { RaceReplay } from "../sim/types";
 import type { PlaybackRef } from "./playback";
@@ -30,6 +31,10 @@ export function CarModel({ carId, replay, playback }: Props) {
   ];
   const steerRefs = [useRef<THREE.Group>(null), useRef<THREE.Group>(null)];
   const state = useMemo(makeSampledState, []);
+
+  useEffect(() => {
+    if (model.glb) preloadCarModel(model);
+  }, [model.glb]);
 
   useFrame(() => {
     const pb = playback.current;
@@ -65,7 +70,12 @@ export function CarModel({ carId, replay, playback }: Props) {
   return (
     <group ref={root}>
       {model.glb ? (
-        <GLBCar url={model.glb} />
+        <GLBCar
+          url={model.glb}
+          rotationY={model.rotationY}
+          bodyRef={body}
+          flameRef={flame}
+        />
       ) : (
         <ProceduralCar
           model={model}
@@ -79,35 +89,41 @@ export function CarModel({ carId, replay, playback }: Props) {
   );
 }
 
-function GLBCar({ url }: { url: string }) {
+function GLBCar({
+  url,
+  rotationY = 0,
+  bodyRef,
+  flameRef,
+}: {
+  url: string;
+  rotationY?: number;
+  bodyRef: React.RefObject<THREE.Group | null>;
+  flameRef: React.RefObject<THREE.Mesh | null>;
+}) {
   const gltf = useGLTF(url);
-  const scene = useMemo(() => {
-    const clone = gltf.scene.clone(true);
-    const box = new THREE.Box3().setFromObject(clone);
-    const size = new THREE.Vector3();
-    box.getSize(size);
-    const longest = Math.max(size.x, size.z) || 1;
-    const scale = CAR_LENGTH / longest;
-    clone.scale.setScalar(scale);
-    clone.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh) return;
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      const mats = Array.isArray(mesh.material)
-        ? mesh.material
-        : [mesh.material];
-      for (const mat of mats) {
-        if (!mat || !("roughness" in mat)) continue;
-        const std = mat as THREE.MeshStandardMaterial;
-        std.envMapIntensity = 1.1;
-        std.roughness = Math.min(std.roughness, 0.45);
-        std.metalness = Math.max(std.metalness, 0.35);
-      }
-    });
-    return clone;
-  }, [gltf.scene]);
-  return <primitive object={scene} />;
+  const scene = useMemo(
+    () =>
+      prepareGlbScene(gltf.scene, {
+        targetLength: CAR_LENGTH,
+        rotationY,
+      }),
+    [gltf.scene, rotationY],
+  );
+  return (
+    <group ref={bodyRef}>
+      <primitive object={scene} />
+      <mesh ref={flameRef} position={[0, 0.55, 2.05]} visible={false}>
+        <coneGeometry args={[0.32, 1.4, 10]} />
+        <meshStandardMaterial
+          color="#ffce54"
+          emissive="#ff7a18"
+          emissiveIntensity={2.5}
+          transparent
+          opacity={0.85}
+        />
+      </mesh>
+    </group>
+  );
 }
 
 interface CarProps {

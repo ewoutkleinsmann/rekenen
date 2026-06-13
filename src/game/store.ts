@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import type { GamePhase, GameSave, RoundState } from "./types";
-import { createNewSave, loadSave, saveGame, clearSave } from "./persistence";
+import { createNewSave, loadSave, saveGame, clearSave, sanitizeSave } from "./persistence";
 import { generateRoundQuestions } from "../questions/registry";
+import { applyReviewQueueAnswer } from "../questions/reviewQueue";
 import { calculatePoints } from "../quiz/scoring";
 import { validateAnswer } from "../questions/registry";
 import { buyCar, applyUpgrade } from "../garage/shop";
@@ -29,14 +30,30 @@ interface GameStore extends GameSave {
   persist: () => void;
 }
 
-function newRoundState(seed: number): RoundState {
+function newRoundState(seed: number, questionSnapshots: Question[]): RoundState {
   return {
     questionIndex: 0,
     seed,
     creditsThisRound: 0,
     answers: [],
-    currentQuestions: [],
+    questionSnapshots,
   };
+}
+
+function resolveQuestionsForSave(saved: GameSave): Question[] {
+  const snapshots = saved.roundState?.questionSnapshots;
+  if (snapshots && snapshots.length > 0) return snapshots;
+  if (
+    saved.roundState &&
+    (saved.phase === "quiz" || saved.phase === "intro")
+  ) {
+    return generateRoundQuestions(
+      saved.level,
+      saved.roundState.seed,
+      saved.reviewQueue ?? [],
+    );
+  }
+  return [];
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -50,10 +67,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const needsQuestions =
         saved.roundState &&
         (saved.phase === "quiz" || saved.phase === "intro");
-      const questions = needsQuestions
-        ? generateRoundQuestions(saved.level, saved.roundState!.seed)
-        : [];
-      set({ ...saved, questions, raceReplay: null });
+      const questions = needsQuestions ? resolveQuestionsForSave(saved) : [];
+      set({
+        ...saved,
+        reviewQueue: saved.reviewQueue ?? [],
+        questions,
+        raceReplay: null,
+      });
     }
   },
 
@@ -70,12 +90,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   startLevel() {
-    const { level } = get();
+    const { level, reviewQueue } = get();
     const seed = Math.floor(Math.random() * 1_000_000);
-    const questions = generateRoundQuestions(level, seed);
+    const queue = reviewQueue ?? [];
+    const questions = generateRoundQuestions(level, seed, queue);
     set({
       phase: "intro",
-      roundState: newRoundState(seed),
+      roundState: newRoundState(seed, questions),
       questions,
       lastRaceResult: undefined,
     });
@@ -91,11 +112,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     const round = state.roundState;
     if (!round) return;
+    if (round.answers.length > round.questionIndex) return;
+    if (round.questionIndex >= state.questions.length) return;
     const question = state.questions[round.questionIndex];
     if (!question) return;
 
     const correct = validateAnswer(question, input);
     const points = calculatePoints(correct, timeRemainingMs, question.timeMs);
+    const reviewQueue = applyReviewQueueAnswer(
+      get().reviewQueue ?? [],
+      question,
+      correct,
+    );
     const answers = [
       ...round.answers,
       {
@@ -114,11 +142,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         roundState: {
           ...round,
           answers,
-          creditsThisRound,
+          creditsThisRound: 0,
+          roundEarned: creditsThisRound,
           questionIndex: nextIndex,
         },
         credits: state.credits + creditsThisRound,
         phase: "shop",
+        reviewQueue,
         stats: {
           ...state.stats,
           totalCorrect:
@@ -133,6 +163,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           creditsThisRound,
           questionIndex: nextIndex,
         },
+        reviewQueue,
       });
     }
     get().persist();
@@ -260,6 +291,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void finishRace;
     void continueAfterResult;
     void persist;
-    saveGame(save);
+    saveGame(sanitizeSave(save as GameSave));
   },
 }));

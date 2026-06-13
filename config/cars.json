@@ -78,6 +78,54 @@
         "weight": 45
       },
       "trait": { "rocketBonus": 0.25 }
+    },
+    {
+      "id": "bone-shaker",
+      "name": "Bone Shaker",
+      "description": "Klassieke Hot Wheels — scherp in bochten, zwaar maar stabiel.",
+      "price": 390,
+      "minUnlockLevel": 9,
+      "stats": {
+        "speed": 58,
+        "acceleration": 62,
+        "handling": 88,
+        "grip": 79,
+        "boost": 48,
+        "weight": 58
+      },
+      "trait": { "curveHandlingBonus": 0.14 }
+    },
+    {
+      "id": "splittin-image",
+      "name": "Splittin' Image",
+      "description": "Stunt-dual: boost én sprong, maar geen echte specialist.",
+      "price": 410,
+      "minUnlockLevel": 11,
+      "stats": {
+        "speed": 70,
+        "acceleration": 72,
+        "handling": 58,
+        "grip": 54,
+        "boost": 76,
+        "weight": 47
+      },
+      "trait": { "boosterBonus": 0.07, "jumpBonus": 0.1 }
+    },
+    {
+      "id": "shaker-hammer",
+      "name": "Shaker Hammer",
+      "description": "Brute muscle voor lange rechten en booster-ketens.",
+      "price": 450,
+      "minUnlockLevel": 13,
+      "stats": {
+        "speed": 76,
+        "acceleration": 68,
+        "handling": 42,
+        "grip": 48,
+        "boost": 82,
+        "weight": 52
+      },
+      "trait": { "boosterBonus": 0.11 }
     }
   ],
   "statMax": 115,

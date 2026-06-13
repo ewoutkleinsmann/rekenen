@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 48" role="img" aria-label="Shaker Hammer">
+  <ellipse cx="18" cy="38" rx="11" ry="11" fill="#1A1A2E" stroke="#888" stroke-width="1.5"/>
+  <ellipse cx="102" cy="38" rx="11" ry="11" fill="#1A1A2E" stroke="#888" stroke-width="1.5"/>
+  <path d="M10 32 L30 20 L50 17 L88 17 L110 24 L115 32 L100 36 L50 33 L30 36 Z" fill="#8B0000" stroke="#FFD700" stroke-width="1"/>
+  <rect x="35" y="22" width="18" height="10" rx="1" fill="#FFD700" opacity="0.9"/>
+  <path d="M112 24 L118 22 L118 30 L112 30 Z" fill="#87CEEB" opacity="0.7"/>
+</svg>

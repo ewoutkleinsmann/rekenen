@@ -13,7 +13,11 @@ export function physicsGrip(stats: EffectiveStats): number {
 }
 
 export function physicsHandling(stats: EffectiveStats): number {
-  return physicsStat(stats.handling);
+  let h = physicsStat(stats.handling);
+  const trait = getCar(stats.carId).trait;
+  const curve = trait?.curveHandlingBonus;
+  if (curve) h *= 1 + curve;
+  return h;
 }
 
 export function hasLoopSpecialist(stats: EffectiveStats): boolean {

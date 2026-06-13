@@ -3,7 +3,7 @@
   "maxTimeBonus": 13,
   "questionsPerRound": 10,
   "minTimeMs": 4000,
-  "maxTimeMs": 25000,
+  "maxTimeMs": 60000,
   "startingCredits": 0,
   "starterCarId": "booster-blaze"
 }

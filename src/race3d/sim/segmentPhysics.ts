@@ -118,7 +118,7 @@ export function jumpMinSpeedForSafeLanding(
 
 export function jumpFailureReason(
   segment: TrackSegment & { type: "jump" },
-  stats: { weight: number; jumpLandingBonus: number },
+  stats: EffectiveStats,
   velocity: number,
 ): string | null {
   const minGap = jumpMinSpeed(segment.length, stats);

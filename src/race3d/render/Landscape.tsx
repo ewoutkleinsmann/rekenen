@@ -1,4 +1,5 @@
 import { Terrain } from "./Terrain";
+import { CityBuildings } from "./CityBuildings";
 import { TrackSurroundings } from "./TrackSurroundings";
 import { Track3D } from "./Track3D";
 import type { Track3D as Track3DData } from "../sim/buildTrack3d";
@@ -18,6 +19,7 @@ export function Landscape({ track, groundY }: Props) {
       <Terrain track={track} cx={cx} cz={cz} baseY={groundY} />
       <Track3D track={track} />
       <TrackSurroundings track={track} groundY={groundY} />
+      <CityBuildings track={track} groundY={groundY} />
     </group>
   );
 }

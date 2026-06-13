@@ -4,7 +4,7 @@
       "id": 1,
       "blok": 1,
       "name": "Rookie Rally",
-      "baseTimeMs": 15000,
+      "baseTimeMs": 30000,
       "questionCategories": [
         "add_sub_30",
         "measure_text",
@@ -17,7 +17,7 @@
       "id": 2,
       "blok": 2,
       "name": "Speedway Sprint",
-      "baseTimeMs": 14000,
+      "baseTimeMs": 28000,
       "questionCategories": [
         "add_sub_30",
         "measure_text",
@@ -34,7 +34,7 @@
       "id": 3,
       "blok": 3,
       "name": "Turbo Track",
-      "baseTimeMs": 13000,
+      "baseTimeMs": 26000,
       "questionCategories": [
         "add_sub_30",
         "measure_text",
@@ -54,7 +54,7 @@
       "id": 4,
       "blok": 4,
       "name": "Curve Crusher",
-      "baseTimeMs": 12000,
+      "baseTimeMs": 24000,
       "questionCategories": [
         "tens_to_100",
         "clock_quarter",
@@ -74,7 +74,7 @@
       "id": 5,
       "blok": 5,
       "name": "Loop Launcher",
-      "baseTimeMs": 11000,
+      "baseTimeMs": 22000,
       "questionCategories": [
         "add_sub_100",
         "table_2",
@@ -91,7 +91,7 @@
       "id": 6,
       "blok": 6,
       "name": "Booster Boulevard",
-      "baseTimeMs": 10000,
+      "baseTimeMs": 20000,
       "questionCategories": [
         "table_3",
         "add_sub_100",
@@ -105,7 +105,7 @@
       "id": 7,
       "blok": 7,
       "name": "Grip Gauntlet",
-      "baseTimeMs": 9000,
+      "baseTimeMs": 18000,
       "questionCategories": [
         "table_4",
         "table_8",
@@ -120,7 +120,7 @@
       "id": 8,
       "blok": 8,
       "name": "Jump Junction",
-      "baseTimeMs": 8000,
+      "baseTimeMs": 16000,
       "questionCategories": [
         "table_6",
         "money_mixed",
@@ -134,7 +134,7 @@
       "id": 9,
       "blok": 9,
       "name": "Champion Circuit",
-      "baseTimeMs": 7000,
+      "baseTimeMs": 14000,
       "questionCategories": [
         "skip_count_7",
         "skip_count_100",
@@ -149,7 +149,7 @@
       "id": 10,
       "blok": 10,
       "name": "Autobahn Alley",
-      "baseTimeMs": 6500,
+      "baseTimeMs": 13000,
       "questionCategories": [
         "skip_count_7",
         "skip_count_100",
@@ -165,7 +165,7 @@
       "id": 11,
       "blok": 11,
       "name": "Velocity Viaduct",
-      "baseTimeMs": 6300,
+      "baseTimeMs": 12600,
       "questionCategories": [
         "skip_count_7",
         "skip_count_100",
@@ -182,7 +182,7 @@
       "id": 12,
       "blok": 12,
       "name": "Chicane Charge",
-      "baseTimeMs": 6100,
+      "baseTimeMs": 12200,
       "questionCategories": [
         "skip_count_100",
         "add_sub_100",
@@ -198,7 +198,7 @@
       "id": 13,
       "blok": 13,
       "name": "Marathon Mix",
-      "baseTimeMs": 5900,
+      "baseTimeMs": 11800,
       "questionCategories": [
         "skip_count_100",
         "add_sub_100",
@@ -215,7 +215,7 @@
       "id": 14,
       "blok": 14,
       "name": "Twin Loop Titan",
-      "baseTimeMs": 5700,
+      "baseTimeMs": 11400,
       "questionCategories": [
         "add_sub_100",
         "skip_count_9",
@@ -231,7 +231,7 @@
       "id": 15,
       "blok": 15,
       "name": "Hairpin Express",
-      "baseTimeMs": 5500,
+      "baseTimeMs": 11000,
       "questionCategories": [
         "skip_count_9",
         "skip_count_10_100",
@@ -247,7 +247,7 @@
       "id": 16,
       "blok": 16,
       "name": "Skybridge Saga",
-      "baseTimeMs": 5300,
+      "baseTimeMs": 10600,
       "questionCategories": [
         "skip_count_10_100",
         "table_read",
@@ -263,7 +263,7 @@
       "id": 17,
       "blok": 17,
       "name": "Rocket Runway",
-      "baseTimeMs": 5100,
+      "baseTimeMs": 10200,
       "questionCategories": [
         "table_read",
         "table_fill_gap",
@@ -279,7 +279,7 @@
       "id": 18,
       "blok": 18,
       "name": "Grande Gauntlet",
-      "baseTimeMs": 4900,
+      "baseTimeMs": 9800,
       "questionCategories": [
         "table_fill_gap",
         "table_mult",
@@ -295,7 +295,7 @@
       "id": 19,
       "blok": 19,
       "name": "Ultimate Crown",
-      "baseTimeMs": 4700,
+      "baseTimeMs": 9400,
       "questionCategories": [
         "table_mult",
         "measure_story",

@@ -302,7 +302,7 @@
         }
       ],
       "finishCondition": "complete_all_segments",
-      "timeLimitSec": 18,
+      "timeLimitSec": 20,
       "recommendedCarId": "grip-gt",
       "recommendedCarTip": "Extreme bochten en een strakke loop."
     },

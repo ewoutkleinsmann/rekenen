@@ -1,8 +1,9 @@
 import { Suspense, lazy } from "react";
 import { useGameStore } from "../game/store";
 import { getLevel, getTrack, getQuestionType } from "../config/loadConfig";
+import { getLevelShopHighlights } from "../garage/shopHighlights";
 import { ScreenShell } from "../ui/ScreenShell";
-import { CheckeredFlagIcon } from "../ui/icons";
+import { CheckeredFlagIcon, WheelCreditIcon } from "../ui/icons";
 import { formatRaceClock } from "../race3d/sim/trackTimeLimit";
 import { buildTrack3d } from "../race3d/sim/buildTrack3d";
 import { resolveTrackTimeLimitSec } from "../race3d/sim/trackTimeLimit";
@@ -21,6 +22,7 @@ function newCategoriesForLevel(level: number): string[] {
 export function IntroScreen() {
   const level = useGameStore((s) => s.level);
   const credits = useGameStore((s) => s.credits);
+  const ownedCars = useGameStore((s) => s.ownedCars);
   const beginQuiz = useGameStore((s) => s.beginQuiz);
 
   const levelConfig = getLevel(level);
@@ -30,6 +32,11 @@ export function IntroScreen() {
     buildTrack3d(track).finishDist,
   );
   const newCategories = newCategoriesForLevel(level);
+  const shop = getLevelShopHighlights(level, ownedCars);
+  const showShopBlock =
+    shop.newCarsThisLevel.length > 0 ||
+    shop.purchasableCars.length > 0 ||
+    shop.upgradesAvailable;
 
   return (
     <ScreenShell
@@ -71,6 +78,45 @@ export function IntroScreen() {
           ))}
         </ul>
       </div>
+
+      {showShopBlock && (
+        <div className="intro-new-block intro-shop-block">
+          <h3 className="intro-new-heading">Na de quiz — Booster Shop</h3>
+          <ul className="intro-shop-list">
+            {shop.newCarsThisLevel.length > 0 && (
+              <li className="intro-shop-item intro-shop-item--new">
+                <strong>Nieuwe auto&apos;s</strong>
+                <span>
+                  {shop.newCarsThisLevel.map((c) => c.name).join(", ")}
+                </span>
+              </li>
+            )}
+            {shop.purchasableCars.length > 0 &&
+              shop.newCarsThisLevel.length === 0 && (
+                <li className="intro-shop-item">
+                  <strong>Auto&apos;s te koop</strong>
+                  <span>
+                    {shop.purchasableCars.map((c) => c.name).join(", ")}
+                  </span>
+                </li>
+              )}
+            {shop.upgradesAvailable && (
+              <li className="intro-shop-item">
+                <strong>Upgrades</strong>
+                <span>
+                  Nog {shop.upgradeSlotsRemaining} upgrade-niveaus mogelijk
+                  voor je auto&apos;s
+                </span>
+              </li>
+            )}
+            {credits > 0 && (
+              <li className="intro-shop-credits">
+                <WheelCreditIcon size={20} /> {credits} Wheel Credits
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
 
       <button
         type="button"

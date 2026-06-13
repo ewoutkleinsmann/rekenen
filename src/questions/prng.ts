@@ -14,6 +14,14 @@ export function pickOne<T>(rng: () => number, items: T[]): T {
   return items[Math.floor(rng() * items.length)]!;
 }
 
+/** In-place Fisher–Yates shuffle. */
+export function shuffleInPlace<T>(rng: () => number, items: T[]): void {
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [items[i], items[j]] = [items[j]!, items[i]!];
+  }
+}
+
 export function pickScenario<T>(
   seed: number,
   index: number,

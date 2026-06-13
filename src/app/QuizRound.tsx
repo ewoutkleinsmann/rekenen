@@ -1,11 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useGameStore } from "../game/store";
 import { getLevel } from "../config/loadConfig";
 import { validateAnswer } from "../questions/registry";
 import { QuestionDisplay } from "../ui/QuestionDisplay";
 import { ScreenShell } from "../ui/ScreenShell";
 import { CheckeredFlagIcon } from "../ui/icons";
+import { QuizWrongAnswerModal } from "../ui/QuizWrongAnswerModal";
 import { audio } from "../audio/audio";
+
+const FEEDBACK_OK_MS = 750;
 
 export function QuizRound() {
   const roundState = useGameStore((s) => s.roundState);
@@ -16,24 +19,53 @@ export function QuizRound() {
   const [feedback, setFeedback] = useState<"ok" | "bad" | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const startRef = useRef(0);
-  const inputRef = useRef(input);
-  inputRef.current = input;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const inputValueRef = useRef(input);
+  inputValueRef.current = input;
+  const pendingRemainingRef = useRef(0);
   const questionIndex = roundState?.questionIndex ?? 0;
   const question = questions[questionIndex];
   const levelConfig = getLevel(level);
 
+  const focusAnswer = useCallback(() => {
+    requestAnimationFrame(() => {
+      inputRef.current?.focus({ preventScroll: true });
+    });
+  }, []);
+
   const goNext = useCallback(
     (remaining: number) => {
       if (!question) return;
-      submitAnswer(inputRef.current, remaining);
+      if ((roundState?.answers.length ?? 0) > questionIndex) return;
+      submitAnswer(inputValueRef.current, remaining);
       setInput("");
       setFeedback(null);
     },
-    [question, submitAnswer],
+    [question, questionIndex, roundState?.answers.length, submitAnswer],
   );
 
+  const submittingRef = useRef(false);
+
+  const goNextOnce = useCallback(
+    (remaining: number) => {
+      if (submittingRef.current) return;
+      submittingRef.current = true;
+      goNext(remaining);
+    },
+    [goNext],
+  );
+
+  const continueAfterWrong = useCallback(() => {
+    goNextOnce(pendingRemainingRef.current);
+  }, [goNextOnce]);
+
   useEffect(() => {
-    if (!question) return;
+    submittingRef.current = false;
+    if (feedback === null) focusAnswer();
+  }, [questionIndex, feedback, focusAnswer]);
+
+  useEffect(() => {
+    if (!question || feedback !== null) return;
     startRef.current = performance.now();
     setTimeRemaining(question.timeMs);
     const id = setInterval(() => {
@@ -42,13 +74,18 @@ export function QuizRound() {
       setTimeRemaining(remaining);
       if (remaining <= 0) {
         clearInterval(id);
+        pendingRemainingRef.current = 0;
         setFeedback("bad");
         audio.playWrong();
-        setTimeout(() => goNext(0), 700);
       }
     }, 50);
     return () => clearInterval(id);
-  }, [question, goNext]);
+  }, [question, feedback]);
+
+  const showWrongModal = useMemo(
+    () => feedback === "bad" && question != null,
+    [feedback, question],
+  );
 
   if (!question || !roundState) return null;
 
@@ -59,10 +96,15 @@ export function QuizRound() {
     if (feedback) return;
     const remaining = Math.max(0, timeRemaining);
     const ok = validateAnswer(question, input);
-    setFeedback(ok ? "ok" : "bad");
-    if (ok) audio.playCorrect();
-    else audio.playWrong();
-    setTimeout(() => goNext(remaining), ok ? 700 : 800);
+    if (ok) {
+      setFeedback("ok");
+      audio.playCorrect();
+      setTimeout(() => goNextOnce(remaining), FEEDBACK_OK_MS);
+    } else {
+      pendingRemainingRef.current = remaining;
+      setFeedback("bad");
+      audio.playWrong();
+    }
   };
 
   return (
@@ -95,26 +137,21 @@ export function QuizRound() {
       </div>
       <div
         className={`hw-panel-question question-area ${
-          feedback ? `feedback-${feedback}` : ""
+          feedback === "ok" ? "feedback-ok" : ""
         }`}
       >
         <QuestionDisplay question={question} />
-        {feedback && (
-          <div className={`hw-feedback-overlay ${feedback}`} role="status">
+        {feedback === "ok" && (
+          <div className="hw-feedback-overlay ok" role="status">
             <span className="hw-feedback-badge">
-              {feedback === "ok" ? (
-                <>
-                  <CheckeredFlagIcon size={30} /> Goed!
-                </>
-              ) : (
-                "Mis!"
-              )}
+              <CheckeredFlagIcon size={30} /> Goed!
             </span>
           </div>
         )}
       </div>
       <div className="hw-answer-row">
         <input
+          ref={inputRef}
           className="hw-answer-input"
           value={input}
           onChange={(e) =>
@@ -130,17 +167,25 @@ export function QuizRound() {
           placeholder={
             isClockQuestion ? "bijv. drie uur, half vijf" : "Typ je antwoord"
           }
-          autoFocus
+          disabled={feedback !== null}
         />
         <button
           type="button"
           className="hw-btn hw-btn-primary hw-answer-submit"
           onClick={handleSubmit}
+          disabled={feedback !== null}
         >
           Antwoord
         </button>
       </div>
       <p className="hw-answer-hint">Druk op Enter om te bevestigen</p>
+
+      {showWrongModal && (
+        <QuizWrongAnswerModal
+          question={question}
+          onContinue={continueAfterWrong}
+        />
+      )}
     </ScreenShell>
   );
 }

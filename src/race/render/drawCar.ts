@@ -6,6 +6,9 @@ const FALLBACK_COLORS: Record<string, { body: string; accent: string }> = {
   "jump-jet": { body: "#FFE600", accent: "#DA291C" },
   "loop-king": { body: "#9B59B6", accent: "#FFE600" },
   "rocket-racer": { body: "#2ECC71", accent: "#DA291C" },
+  "bone-shaker": { body: "#C41E3A", accent: "#1A1A1A" },
+  "splittin-image": { body: "#00CED1", accent: "#FF4500" },
+  "shaker-hammer": { body: "#8B0000", accent: "#FFD700" },
 };
 
 export function drawCar(

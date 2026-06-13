@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useGameStore } from "../game/store";
 import { getPurchasableCars, getAvailableUpgrades } from "../garage/shop";
 import { getUpgradePrice, getUpgradeLevel } from "../garage/stats";
 import { getCar } from "../config/loadConfig";
 import { ScreenShell } from "../ui/ScreenShell";
-import { WheelCreditIcon, CarSvg } from "../ui/icons";
+import { WheelCreditIcon } from "../ui/icons";
+import {
+  CarPreview3D,
+  preloadCarPreview,
+} from "../race3d/render/CarPreview3D";
 
 export function ShopScreen() {
   const level = useGameStore((s) => s.level);
@@ -19,10 +23,19 @@ export function ShopScreen() {
     ownedCars[0]?.instanceId ?? "",
   );
 
-  const earned = roundState?.creditsThisRound ?? 0;
-  const purchasableCars = getPurchasableCars(ownedCars, level);
+  const earned =
+    roundState?.roundEarned ?? roundState?.creditsThisRound ?? 0;
+  const purchasableCars = useMemo(
+    () => getPurchasableCars(ownedCars, level),
+    [ownedCars, level],
+  );
   const upgrades = getAvailableUpgrades();
   const carInstance = ownedCars.find((c) => c.instanceId === selectedCar);
+
+  useEffect(() => {
+    if (tab !== "cars") return;
+    for (const car of purchasableCars) preloadCarPreview(car.id);
+  }, [tab, purchasableCars]);
 
   return (
     <ScreenShell variant="shop" className="shop-screen" credits={credits}>
@@ -61,7 +74,7 @@ export function ShopScreen() {
             {purchasableCars.map((car) => (
               <div key={car.id} className="hw-blister-card">
                 <div className="blister-visual">
-                  <CarSvg carId={car.id} width={130} />
+                  <CarPreview3D carId={car.id} />
                 </div>
                 <div className="blister-body">
                   <h3 className="blister-name">{car.name}</h3>

@@ -11,6 +11,7 @@ import { RaceScreen } from "./RaceScreen";
 import { RaceDevScreen } from "./RaceDevScreen";
 import { ResultScreen } from "./ResultScreen";
 
+/** Local dev only: open the app with `?devRace=1` (e.g. http://localhost:5173/?devRace=1). */
 function isRaceDevMode(): boolean {
   return (
     import.meta.env.DEV &&

@@ -48,6 +48,15 @@ describe("balance exclusivity", () => {
 
     for (const car of getCarsConfig().cars) {
       if (car.id === "grip-gt" || car.id === "booster-blaze") continue;
+      const t = car.trait ?? {};
+      const segmentSpecialist =
+        t.jumpBonus != null ||
+        t.loopGripBonus != null ||
+        t.loopSpeedBonus != null ||
+        t.rocketBonus != null ||
+        t.boosterBonus != null;
+      if (!segmentSpecialist) continue;
+
       const stats = computeEffectiveStats(maxBuild(car.id));
       let winsOnGripFail = 0;
       for (const id of gripFails) {

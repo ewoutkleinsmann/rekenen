@@ -1,4 +1,6 @@
 import type { CarStats } from "../config/schemas";
+import type { Question } from "../questions/types";
+import type { ReviewQuestion } from "../questions/reviewQueue";
 
 export type GamePhase =
   | "title"
@@ -31,9 +33,13 @@ export interface AnswerRecord {
 export interface RoundState {
   questionIndex: number;
   seed: number;
+  /** Running total during quiz; cleared after credits are banked. */
   creditsThisRound: number;
+  /** Points banked this round (shop display) after quiz completes. */
+  roundEarned?: number;
   answers: AnswerRecord[];
-  currentQuestions: string[];
+  /** Full quiz set for this round (persisted so reload mid-quiz stays consistent). */
+  questionSnapshots: Question[];
 }
 
 export interface RaceResult {
@@ -59,6 +65,8 @@ export interface GameSave {
   selectedCarInstanceId?: string;
   lastRaceResult?: RaceResult;
   stats: GameStats;
+  /** Questions to revisit after mistakes (higher weight in later rounds). */
+  reviewQueue?: ReviewQuestion[];
 }
 
 export interface EffectiveCar extends CarStats {
